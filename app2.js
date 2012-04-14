@@ -1,58 +1,52 @@
 //app.js Socket IO Test
-var app = require('express').createServer(),
-    redis = require('socket.io/node_modules/redis'),
-    io = require('socket.io').listen(app);
+var express = require("express"),
+	app = express.createServer();
 
-var pub = redis.createClient(port, "url");
-var sub = redis.createClient(port, "url");
-var store = redis.createClient(port, "url");
-pub.auth('pass', function(){console.log("adentro! pub")});
-sub.auth('pass', function(){console.log("adentro! sub")});
-store.auth('pass', function(){console.log("adentro! store")});
+app.get("/", function(req, res) {
+	res.sendfile(__dirname + "/public/index.html");
+});
+
+app.configure(function(){
+	app.use(express.methodOverride());
+	app.use(express.bodyParser());
+	app.use(express.static(__dirname + '/public'));
+	app.use(express.errorHandler({
+		dumpExceptions: true,
+		showStack: true
+	}));
+	app.use(app.router);
+});
+
+var io = require('socket.io').listen(app)
+var redis = require('socket.io/node_modules/redis');
 
 io.configure( function(){
-	io.enable('browser client minification');  // send minified client
-	io.enable('browser client etag');          // apply etag caching logic based on version number
-	io.enable('browser client gzip');          // gzip the file
-	io.set('log level', 1);                    // reduce logging
-	io.set('transports', [                     // enable all transports (optional if you want flashsocket)
-	    'websocket'
-	  , 'flashsocket'
-	  , 'htmlfile'
-	  , 'xhr-polling'
-	  , 'jsonp-polling'
-	]);
 	var RedisStore = require('socket.io/lib/stores/redis');
-	io.set('store', new RedisStore({redisPub:pub, redisSub:sub, redisClient:store}));
+	io.set('store', new RedisStore({
+		redisPub: redis.createClient(),
+		redisSub: redis.createClient(),
+		redisClient: redis.createClient()
+	}));
 });
+
 
 app.listen(8000);
 
-app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
-});
-
-var buffer = [];
 io.sockets.on('connection', function(client){
 	var Room = "";
-    client.on("setNickAndRoom", function(nick, fn){
-    	fn({msg : "Hello " + nick.nick});
-    	client.join(nick.room);
+    client.on("join", function(nick, fn){
     	Room = nick.room;
-    	client.broadcast.to(Room).json.send({ msg: "Se conecto al room: " + nick.room, nick : nick });
+    	client.join(Room);
+    	fn({msg : "Hello " + nick.nick + ", welcome to " + Room});
+    	client.broadcast.to(Room).json.send({msg: nick + " joined " + Room});
     });
 
     client.on('message', function(message, fn){
-        var msg = message; //{ message: [client.sessionId, message] };
-        buffer.push(msg);
-        if (buffer.length > 15)
-        	buffer.shift();
-        client.broadcast.to(Room).json.send(msg);
-        fn(msg);
+        client.broadcast.to(Room).json.send(message);
+        fn(message);
     });
 
     client.on('disconnect', function(){
-    	client.broadcast.to(Room).json.send({ msg: "Se desconecto"});
+    	client.broadcast.to(Room).json.send({msg: "Disconnected"});
     });
-    
 });
