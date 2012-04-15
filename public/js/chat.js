@@ -1,39 +1,67 @@
-// socket.io specific code
-var socket = io.connect('/chat');
-
-socket.on('connect', function() {
-	$('#chat').addClass('connected');
-});
-
-socket.on('message', message);
-socket.on('reconnect', function() {
-	$('#lines').remove();
-	message('System', 'Reconnected to the server');
-});
-
-socket.on('reconnecting', function() {
-	message('System', 'Attempting to re-connect to the server');
-});
-
-socket.on('error', function(e) {
-	message('System', e ? e : 'A unknown error occurred');
-});
-
-function message(from, msg) {
-	$('#lines').append($('<p>').append($('<b>').text(from), msg));
-}
-
-// dom manipulation
-$(function() {
-	$('#chat-input').submit(function() {
-		message('me', $('#message').val());
-		socket.emit('message', $('#message').val());
-		clear();
-		$('#lines').get(0).scrollTop = 10000000;
-		return false;
+var chat = null;
+$(document).ready(function () {
+	$("#nick-space").submit(function (e) {
+		e.preventDefault();
+		$("#nick-space").hide();
+		$("#chat-input").show();
+		chat = new Chat;
+		chat.authenticate($("#nickname").val(), function () {
+			chat.join($("#room").val(), function () {});
+		});
 	});
 
-	function clear() {
-		$('#message').val('').focus();
+	$("#chat-input").submit(function (e) {
+		e.preventDefault();
+		sendMsg();
+	});
+
+	function sendMsg() {
+		var m = $("#message").val();
+		$("#message").val("");
+		chat.send(m, $("#room").val(), function () {});
 	}
 });
+
+function Chat() {
+	this.socket = null;
+	this.nickname = "";
+	this.rooms = [];
+	var self = this;
+
+	this.authenticate = function (nick, callback) {
+		this.socket = io.connect();
+		this.nickname = nick;
+
+		this.socket.on("message", function (msg, p, c) {
+			$("#board").append("<p>" + msg.nick + ": " + msg.msg + "</p>");
+		});
+
+		this.socket.on('connect', function (data) {
+			self.socket.emit('authenticate', nick, function (response) {
+				$("#board").append("<p>" + response.msg + "</p>");
+				callback();
+			});
+		});
+	};
+
+	this.join = function (room, callback) {
+		this.socket.emit('join', room, function (response) {
+			self.rooms.push(room);
+			$("#board").append("<p>" + response.msg + "</p>");
+			callback();
+		});
+	};
+
+	this.send = function (msg, room, callback) {
+		this.socket.emit("message", {
+			msg: msg,
+			nick: this.nickname,
+			room: room
+		},
+		function (response) {
+			$("#board").append("<p>" + self.nickname + ": " + msg + "</p>");
+			callback();
+		});
+	};
+}
+

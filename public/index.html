@@ -34,7 +34,8 @@
 				left:70.5%;
 				width:29%;
 			}
-			#chat form {
+			#chat-input {
+        display:none;
 				position:absolute;
 				bottom:0;
 				width:100%;
@@ -43,20 +44,51 @@
 			#chat div.chatwindow {
 				border:none;
 			}
+      #board {
+        margin-left: 1%;
+        margin-right: 1%;
+      }
 			div div._message .data {
 				color:white;
 			}
 			div div.messages {
 				background-color:black;
 			}
+      .chatText, .chatSubmit {
+        position:absolute;
+      }
+      .chatText {
+        width: 80%;
+        left: 1%;
+      }
+      .chatSubmit {
+        width: 17%;
+        right: 1%;
+      }
+      #nick-space {
+        padding: 1%;
+      }
+      #nick-space label {
+        min-width: 17%;
+      }
+      #nick-space input {
+        margin-top: 1%;
+      }
+      #set-nick {
+        margin-left: 40%;
+        width: 17%;
+      }
+      #nickname, #room {
+        width: 80%;
+      }
 		</style>
 		<link rel="stylesheet" type="text/css" href="css/screen.css"/>
 		
 		<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
 		<script src="js/socket.io.js"></script>
 		<script src="js/jquery-1.7.2.min.js" type="text/javascript"></script>
-  		<script src="js/jquery-ui-1.8.18.custom.min.js" type="text/javascript"></script>
-  		<script type="text/javascript" src="js/chat.js"></script>
+  	<script src="js/jquery-ui-1.8.18.custom.min.js" type="text/javascript"></script>
+  	<script type="text/javascript" src="js/chat.js"></script>
 
 		<script type="text/javascript">
 			function initsite() {
@@ -75,12 +107,18 @@
 
 	<body onload="initsite()">
 		<div id="chat">
-			<div id="lines"></div>
-			<form id="chat-input">
-        	    <div id="inputChats">        
-                	<input type="button" value="kwrq" name="submit" tabindex="2" class="chatSubmit">
-					<input name="text" value="" size="50" class="chatText" id="message" autocomplete="off">
-				</div>
+      <form id="nick-space" action="#">
+        <label for="nickname">nick</label>
+        <input name="nickname" type="text" id="nickname"/>
+        <label for="room">room</label>
+        <input name="room" type="text" id="room"/>
+        <input type="submit" id="set-nick" value="join"/>
+      </form>
+
+			<div id="board"></div>
+			<form id="chat-input" action="#">
+       	<input type="button" value="kwrq" name="submit" tabindex="2" class="chatSubmit">
+			 	<input name="text" value="" size="50" class="chatText" id="message" autocomplete="off">
 			</form>
 		</div>
 		<div id="map"></div>
