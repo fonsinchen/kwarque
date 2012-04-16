@@ -1,31 +1,3 @@
-var chat = null;
-$(document).ready(function () {
-    function displayMessage (msg) {
-        $('#board').append($(document.createElement('p')).text(msg.nick + ': ' + msg.msg));
-    }
-	$("#nick-space").submit(function (e) {
-		e.preventDefault();
-		$("#nick-space").hide();
-		$("#chat-input").show();
-        
-		chat = new KwarqueChat;
-        chat.on('message', displayMessage);
-		chat.authenticate($("#nickname").val(), "", function (response) {
-            displayMessage(response);
-			chat.join($("#room").val(), function (response) {
-                displayMessage(response);
-            });
-		});
-	});
-
-	$("#chat-input").submit(function (e) {
-		e.preventDefault();
-		var m = $("#message").val();
-		$("#message").val("");
-		chat.send(m, $("#room").val(), displayMessage);
-	});
-});
-
 function KwarqueChat() {
 	this.socket = io.connect();
 	this.nick = null;
