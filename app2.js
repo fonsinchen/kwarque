@@ -50,13 +50,28 @@ io.sockets.on('connection', function (client) {
 		client.rooms.push(room);
 		client.join(room);
 		fn({
-			msg: "Welcome to " + room
+			msg: "Welcome to " + room,
+			nick: "Server",
+			room: room
 		});
 		client.broadcast.to(room).json.send({
 			msg: client.nick + " joined " + room,
 			nick: "Server",
 			room: room
 		});
+	});
+
+	client.on('leave', function (room, fn) {
+		var index = self.rooms.indexOf(room);
+		if (index !== - 1) {
+			self.rooms.splice(index, 1);
+			client.leave(room);
+			client.broadcast.to(room).json.send({
+				msg: client.nick + " left " + room,
+				nick: "Server",
+				room: room
+			});
+		}
 	});
 
 	client.on('message', function (message, fn) {
