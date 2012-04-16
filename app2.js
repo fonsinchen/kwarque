@@ -37,47 +37,51 @@ io.sockets.on('connection', function (client) {
 	client.rooms = [];
 	client.nick = "";
 
-	client.on("authenticate", function (nick, fn) {
-		client.nick = nick;
+	client.on("authenticate", function (login, fn) {
+		client.nick = login.nick;
 		fn({
-			msg: "Hello " + nick,
+			msg: "Hello " + login.nick,
 			nick: "Server",
-			room: "~" + nick
+			room: "~" + login.nick
 		});
 	});
 
-	client.on("join", function (room, fn) {
-		client.rooms.push(room);
-		client.join(room);
+	client.on("join", function (msg, fn) {
+		client.rooms.push(msg.room);
+		client.join(msg.room);
 		fn({
-			msg: "Welcome to " + room,
+			msg: "Welcome to " + msg.room,
 			nick: "Server",
-			room: room
+			room: msg.room
 		});
-		client.broadcast.to(room).json.send({
-			msg: client.nick + " joined " + room,
+		client.broadcast.to(msg.room).json.send({
+			msg: client.nick + " has joined " + msg.room,
 			nick: "Server",
-			room: room
+			room: msg.room
 		});
 	});
 
-	client.on('leave', function (room, fn) {
-		var index = self.rooms.indexOf(room);
+	client.on('leave', function (msg, fn) {
+		var index = self.rooms.indexOf(msg.room);
 		if (index !== - 1) {
 			self.rooms.splice(index, 1);
-			client.leave(room);
-			client.broadcast.to(room).json.send({
-				msg: client.nick + " left " + room,
+			client.leave(msg.room);
+			client.broadcast.to(msg.room).json.send({
+				msg: client.nick + " left " + msg.room,
 				nick: "Server",
-				room: room
+				room: msg.room
 			});
 		}
+        fn({
+            msg: "Goodbye",
+            nick: "Server",
+            room: msg.room
+        });
 	});
 
-	client.on('message', function (message, fn) {
-		console.log("message: " + message.msg);
-		client.broadcast.to(message.room).json.send(message);
-		fn(message);
+	client.on('message', function (msg, fn) {
+		client.broadcast.to(msg.room).json.send(msg);
+		fn(msg);
 	});
 
 	client.on('disconnect', function () {

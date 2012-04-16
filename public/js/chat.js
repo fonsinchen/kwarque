@@ -1,66 +1,114 @@
 var chat = null;
 $(document).ready(function () {
+    function displayMessage (msg) {
+        $('#board').append($(document.createElement('p')).text(msg.nick + ': ' + msg.msg));
+    }
 	$("#nick-space").submit(function (e) {
 		e.preventDefault();
 		$("#nick-space").hide();
 		$("#chat-input").show();
-		chat = new Chat;
-		chat.authenticate($("#nickname").val(), function () {
-			chat.join($("#room").val(), function () {});
+        
+		chat = new KwarqueChat;
+        chat.on('message', displayMessage);
+		chat.authenticate($("#nickname").val(), "", function (response) {
+            displayMessage(response);
+			chat.join($("#room").val(), function (response) {
+                displayMessage(response);
+            });
 		});
 	});
 
 	$("#chat-input").submit(function (e) {
 		e.preventDefault();
-		sendMsg();
-	});
-
-	function sendMsg() {
 		var m = $("#message").val();
 		$("#message").val("");
-		chat.send(m, $("#room").val(), function () {});
-	}
+		chat.send(m, $("#room").val(), displayMessage);
+	});
 });
 
-function Chat() {
-	this.socket = null;
-	this.nickname = "";
+function KwarqueChat() {
+	this.socket = io.connect();
+	this.nick = null;
 	this.rooms = [];
-	var self = this;
+	this.roomCallbacks = {};
+	this.globalCallbacks = {};
+    var self = this;
 
-	this.authenticate = function (nick, callback) {
-		this.socket = io.connect();
-		this.nickname = nick;
+	this.on = function (event, callback) {
+		this.socket.on(event, callback);
+		if (typeof this.globalCallbacks[event] === "undefined") {
+			this.globalCallbacks[event] = [callback];
+		} else {
+			this.globalCallbacks[event].push(callback);
+		}
+	};
 
-		this.socket.on("message", function (msg, p, c) {
-			$("#board").append("<p>" + msg.nick + ": " + msg.msg + "</p>");
-		});
-
-		this.socket.on('connect', function (data) {
-			self.socket.emit('authenticate', nick, function (response) {
-				$("#board").append("<p>" + response.msg + "</p>");
-				callback();
+	this.onRoom = function (event, room, callback) {
+		if (typeof this.roomCallbacks[event] === "undefined") {
+			this.roomCallbacks[event] = {};
+			this.roomCallbacks[event][room] = [callback];
+			this.on(event, function (msg) {
+				for (var room in self.roomCallbacks[event]) {
+					if (room === msg.room && self.roomCallbacks[event].hasOwnProperty(room)) {
+						self.roomCallbacks[event][room](msg);
+					}
+				}
 			});
-		});
+		} else if (typeof this.roomCallbacks[event][room] === "undefined") {
+			this.roomCallbacks[event][room] = [callback];
+		} else {
+			this.roomCallbacks[event][room].push(callback);
+		}
+	};
+
+	this.authenticate = function (nick, password, callback) {
+		this.nick = nick;
+        var doAuth = function () {
+			self.socket.emit('authenticate', {
+                nick : nick,
+                password : password,
+                room : null
+            }, function (response) {
+				callback(response);
+			});
+		};
+        if (this.socket.connected) {
+            doAuth();
+        } else {
+    		this.socket.on('connect', doAuth);
+        }
 	};
 
 	this.join = function (room, callback) {
-		this.socket.emit('join', room, function (response) {
+		this.socket.emit('join', {
+			room: room,
+			nick: self.nick,
+		}, function (response) {
 			self.rooms.push(room);
-			$("#board").append("<p>" + response.msg + "</p>");
-			callback();
+			callback(response);
 		});
+	};
+
+	this.leave = function (room, callback) {
+		var index = self.rooms.indexOf(room);
+		if (index !== - 1) {
+			this.socket.emit('leave', {
+				room: room,
+				nick: self.nick
+			}, function (response) {
+				self.rooms.splice(index, 1);
+				callback(response);
+			});
+		}
 	};
 
 	this.send = function (msg, room, callback) {
 		this.socket.emit("message", {
 			msg: msg,
-			nick: this.nickname,
+			nick: self.nick,
 			room: room
-		},
-		function (response) {
-			$("#board").append("<p>" + self.nickname + ": " + msg + "</p>");
-			callback();
+		}, function (response) {
+			callback(response);
 		});
 	};
 }
