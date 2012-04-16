@@ -36,6 +36,18 @@
                 }]);
 	    	});
             d.chat.on('message', $.proxy(methods.message, self));
+            d.chat.on('clientJoined', function(msg) {
+                methods.message.apply(self, [$.extend(msg, {
+                    msg : msg.nick + ' has joined',
+                    nick : 'sixth sense'
+                })]);
+            });
+            d.chat.on('clientLeft', function(msg) {
+                methods.message.apply(self, [$.extend(msg, {
+                    msg : msg.nick + ' has left',
+                    nick : 'sixth sense'
+                })]);
+            });
 		    methods.createAccordion.apply(this);
             $('.' + d.config.inputFormClass).submit(function (e) {
         		e.preventDefault();
@@ -91,15 +103,19 @@
         openWindow: function(room, callback) {
             callback = callback || $.noop;
             var d = this.data('accChat');
+            var el = this;
             if (typeof d.windows[room] !== 'undefined') {
                 var changeCallback = function() {
-                    d.chat.unbind("accordionchange", changeCallback);
+                    el.unbind("accordionchange", changeCallback);
                     callback();
                 };
-                d.chat.bind("accordionchange", changeCallback);
-                d.chat.accordion("activate", d.windows[room].pos);
+                el.bind("accordionchange", changeCallback);
+                el.accordion("activate", d.windows[room].pos);
             } else {
-                methods.createWindow.apply(this, [room, callback]);
+                methods.createWindow.apply(el, [room, function(msg) {
+                    methods.message.apply(el, [msg]);
+                    el.accordion("activate", d.windows[room].pos);
+                }]);
             }
             return this;
         },
