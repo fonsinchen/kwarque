@@ -26,6 +26,9 @@
 				position:absolute;
 				border: 2px solid red;
 			}
+      .kwarqueChat {
+        height: 90%;
+      }
 			#map {
 				width:69.5%;
 				left: 0.5%;
@@ -38,8 +41,11 @@
 				height:2%;
 			}
       .container {
-        margin-right: 1%;
-        margin-left: 1%;
+        padding-right: 1%;
+        padding-left: 1%;
+        max-height: 75%;
+        min-height: 25%;
+				overflow: auto;
       }
 			#chat div.chatwindow {
 				border:none;
@@ -110,6 +116,8 @@
           $('.kwarqueChat').accChat({
             nick : $("#nickname").val(),
             password : ''
+          }, function() {
+            $('.kwarqueChat').accChat('openWindow', 'global');
           });
         });
 			}
