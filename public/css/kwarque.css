@@ -1,0 +1,91 @@
+* {
+    background-color: black;
+    color: white;
+}
+
+svg {
+    background-color:transparent;
+}
+
+body {
+    margin-left: 0;
+    margin-right: 0;
+    overflow: hidden;
+}
+div div.offline div.messages, div.offline div.messages div,
+div div.left div.messages, div.left div.messages div,
+div.left div.memberslist th,
+div.offline div.memberslist th {
+    background-color: black;
+    color: gray;
+}
+div div.status div.messages, div div.public div.messages, div div.private div.messages {
+    height: 75%;
+    overflow: auto;
+}
+#map, #chat {
+    height:98%;
+    position:absolute;
+    border: 2px solid red;
+}
+.kwarqueChat {
+    height: 90%;
+}
+#map {
+    width:69.5%;
+    left: 0.5%;
+}
+.chatInput {
+    display:none;
+    position:absolute;
+    bottom:0;
+    width:100%;
+    height:2%;
+}
+.container {
+    padding-right: 1%;
+    padding-left: 1%;
+    max-height: 75%;
+    min-height: 25%;
+    overflow: auto;
+}
+#chat div.chatwindow {
+    border:none;
+}
+#chat {
+    left:70.5%;
+    width:29%;
+}
+div div._message .data {
+    color:white;
+}
+div div.messages {
+    background-color:black;
+}
+.chatMessage, .chatSubmit {
+    position:absolute;
+}
+.chatMessage {
+    width: 80%;
+    left: 1%;
+}
+.chatSubmit {
+    width: 17%;
+    right: 1%;
+}
+#nick-space {
+    padding: 1%;
+}
+#nick-space label {
+    min-width: 17%;
+}
+#nick-space input {
+    margin-top: 1%;
+}
+#set-nick {
+    margin-left: 40%;
+    width: 17%;
+}
+#nickname, #room {
+    width: 80%;
+}
