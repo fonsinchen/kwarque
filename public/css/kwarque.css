@@ -89,3 +89,7 @@ div div.messages {
 #nickname, #room {
     width: 80%;
 }
+
+.ui-widget-header, .ui-widget-content {
+    background: none repeat scroll 0 0 black;
+}
