@@ -3,11 +3,11 @@
     color: white;
 }
 
-#temlates {
+#templates {
     display:none;
 }
 
-svg {
+svg, img, .olLayerDiv div, .olControlPanZoom div {
     background-color:transparent;
 }
 

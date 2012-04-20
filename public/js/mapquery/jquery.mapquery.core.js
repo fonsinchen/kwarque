@@ -263,7 +263,6 @@ extent from the map. The coordinates are returned in displayProjection.
         // Get the current position
         if (arguments.length===0) {
             position = this.olMap.getCenter();
-            zoom = this.olMap.getZoom();
             box = this.olMap.getExtent();
             mapProjection = this.olMap.getProjectionObject();
 
@@ -307,6 +306,7 @@ extent from the map. The coordinates are returned in displayProjection.
             // pass it on
             this.olMap.setCenter(position, options.zoom);
         }
+        return null;
     },
     _updateSelectFeatureControl: function(layerIds) {
         var vectorLayers = [];
@@ -566,12 +566,23 @@ If no opacity is given, it will return the current opacity.
 };
 
 $.fn.mapQuery = function(options) {
-    return this.each(function() {
-        var instance = $.data(this, 'mapQuery');
-        if (!instance) {
+    var ret = this;
+    var args = arguments;
+    this.each(function () {
+        var map = $.data(this, 'mapQuery');
+        if (map && map[options]) {
+            ret = map[options].apply(map, Array.prototype.slice.call(args, 1));
+        } else if (!map && (typeof options === 'object' || !options)) {
             $.data(this, 'mapQuery', new $.MapQuery.Map($(this), options));
+        } else if (!map) {
+            $.error('Method ' + options + ' called on undefined map.');
+        } else if (typeof options === 'string') {
+            $.error('Method ' + options + ' does not exist for map.');
+        } else {
+            $.error('Trying to overwrite map? Destroy it first.');
         }
     });
+    return ret;
 };
 
 $.extend($.MapQuery.Layer, {

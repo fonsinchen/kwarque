@@ -3,30 +3,29 @@
 (function (K, $) {
     var methods = {
         init : function() {
-            $(this).mapQuery({
-                theme: "",
-                layers:[{
-                    type:'osm'
-                },{
-                    // TODO:
-                    // make that a "vector" layer. Then we can "addFeatures"
-                    // to it. Furthermore listen to the "moved" event of the
-                    // OSM layer to determine if the map has moved and if we
-                    // want to remove features or search for new ones.
-                    type: 'JSON',
-                    label: 'Polygons',
-                    url: 'poly.json'
-                }],
-                center : {
-                    position : [13.41,52.52], 
-                    zoom : 15
-                },
-                projection: "EPSG:900913"
+            var map = new OpenLayers.Map({div : this[0]});
+            map.addLayer(new OpenLayers.Layer.OSM());
+ 
+            var lonLat = new OpenLayers.LonLat(13.41,52.52).transform(
+                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                map.getProjectionObject() // to Spherical Mercator Projection
+            );
+ 
+            var markers = new OpenLayers.Layer.Markers( "Markers" );
+            map.addLayer(markers);
+            map.setCenter (lonLat, 16);
+            markers.addMarker(new OpenLayers.Marker(lonLat));   
+            this.data('kwarqueMap', {
+                map : map,
+                content : markers
             });
+            return this;
         },
-        
+        //TODO: functions addMarker/removeMarker instead. Adds a marker, binds 
+        // click handlers to it, opens popup as needed. We cannot bind click
+        // handlers to the content layer.
         popup : function() {
-            $('#kwarque-map-popup').mqPopup({
+            $('#kwarque-map-popup').mapPopup({
                 map: this,
                 contents: function(feature) {
                     return K.dce('p').text(feature.data.id);
