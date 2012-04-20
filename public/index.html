@@ -1,7 +1,9 @@
+<!DOCTYPE html>
 <html>
     <head>
+        <title>kwarque</title>
         <link rel="stylesheet" type="text/css" href="css/kwarque.css"/>
-        <link rel="stylesheet" type="text/css" href="css/screen.css"/>
+        <link rel="stylesheet" type="text/css" href="css/chat.css"/>
         <link rel="stylesheet" type="text/css" href="css/mapquery.css"/>
         <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.8.19.custom.css"/>
 
@@ -9,56 +11,39 @@
         <script src="js/socket.io.js" type="text/javascript"></script>
         <script src="js/jquery-1.7.2.min.js" type="text/javascript"></script>
         <script src="js/jquery-ui-1.8.19.custom.min.js" type="text/javascript"></script>
+        <script src="js/kwarque.js" type="text/javascript"></script>
         <script src="js/chat.js" type="text/javascript"></script>
         <script src="js/chatUi.js" type="text/javascript"></script>
+        <script src="js/map.js" type="text/javascript"></script>
         <script src="js/mapquery/jquery.mapquery.core.js" type="text/javascript"></script>
         <script src="js/mapquery/jquery.mapquery.popup.js" type="text/javascript"></script>
         <script src="js/mapquery/jquery.mapquery.mqPopup.js" type="text/javascript"></script>
 
 
         <script type="text/javascript">
-            function initsite() {
-                var map =$('#map').mapQuery({
-                    theme: "",
-                    layers:[{
-                        type:'osm'
-                    },{
-                        // TODO:
-                        // make that a "vector" layer. Then we can "addFeatures"
-                        // to it. Furthermore listen to the "moved" event of the
-                        // OSM layer to determine if the map has moved and if we
-                        // want to remove features or search for new ones.
-                        type: 'JSON',
-                        label: 'Polygons',
-                        url: 'poly.json'
-                    }],
-                    center : {position : [13.41,52.52], zoom : 15},
-                    projection: "EPSG:900913"
-                });
-                $('#popup').mqPopup({
-                    map: '#map',
-                    contents: function(feature) {
-                        return '<p>' + feature.data.id + '</p>';
-                    }
-                });
-
-                $("#nick-space").submit(function (e) {
-                    e.preventDefault();
-                    $("#nick-space").hide();
-                    $(".chatInput").show();
-                    $('.kwarqueChat').accChat({
-                        nick : $("#nickname").val(),
-                        password : ''
-                    }, function() {
-                        $('.kwarqueChat').accChat('openWindow', 'global');
+            (function ($) {
+                $(document).ready(function() {
+                    $("#map").kwarqueMap();
+                    $("#map").kwarqueMap("popup");
+                    $("#nick-space").submit(function (e) {
+                        e.preventDefault();
+                        var nick = $("#nickname").val();
+                        $("#nick-space").remove();
+                        $("#chat-input").show();
+                        $('.kwarque-chat').kwarqueChat({
+                            nick : nick,
+                            password : ''
+                        }, function() {
+                            $('.kwarque-chat').kwarqueChat('openWindow', 'global');
+                        });
                     });
                 });
-            }
+            })(jQuery);
         </script>
     </head>
 
-    <body onload="initsite()">
-        <div id="chat">
+    <body>
+        <div id="chat" class="kwarque-chat">
             <form id="nick-space" action="#">
                 <label for="nickname">nick</label>
                 <input name="nickname" type="text" id="nickname"/>
@@ -66,14 +51,22 @@
                 <input name="room" type="text" id="room"/>
                 <input type="submit" id="set-nick" value="join"/>
             </form>
-
-            <div class="kwarqueChat"></div>
-            <form class="chatInput" action="#">
-                <input type="button" value="kwrq" name="submit" tabindex="2" class="chatSubmit">
-                <input name="text" value="" size="50" class="chatMessage" autocomplete="off">
+                    
+            <form id="chat-input" class="kwarque-chat-input" action="#">
+                <input type="submit" value="kwrq" tabindex="2" class="kwarque-chat-submit">
+                <input name="text" value="" size="50" class="kwarque-chat-message" autocomplete="off">
             </form>
         </div>
         <div id="map" class="map"></div>
-        <div id="popup" class="mq-widget"></div>
+        <div id="templates">
+            <div id="kwarque-map-popup" class="mq-widget">
+                <div class="mq-popup ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
+                    <span class="ui-dialog-title"></span>
+                    <a class="ui-dialog-titlebar-close ui-corner-all" href="#">
+                    <span class="ui-icon ui-icon-closethick">close</span></a>
+                </div>
+                <div class="ui-dialog-content ui-widget-content"></div>
+            </div>
+        </div>
     </body>
 </html>

@@ -1,14 +1,11 @@
 "use strict";
-(function ($) {
-    var dce = function(name) {
-        return $(document.createElement(name));
-    };
+(function (K, $) {
 	var methods = {
         init: function (uconfig, callback) {
             callback = callback || $.noop;
             var self = this;
-            this.data('accChat', {
-            	chat : new KwarqueChat,
+            this.data('kwarqueChat', {
+            	chat : K.create(K.chat()),
 	            windows : {},
 	            activeRoom : null,
             	config : $.extend({
@@ -19,16 +16,14 @@
                     privateClass: 'private',
                     publicClass: 'public',
                     statusClass: 'status',
-                    inputFormClass: 'chatInput',
-                    inputMessageClass: 'chatMessage',
                     containerClass: 'container'
             	}, uconfig)
             });
-            var d = this.data('accChat');
+            var d = this.data('kwarqueChat');
 
 		    d.chat.authenticate(d.config.nick, d.config.password, function (response1) {
                 d.activeRoom = response1.room;
-                self.data('accChat', d);
+                self.data('kwarqueChat', d);
 				methods.createWindow.apply(self, [response1.room, function (response2) {
                     methods.message.apply(self, [response1]);
                     methods.message.apply(self, [response2]);
@@ -49,9 +44,9 @@
                 })]);
             });
 		    methods.createAccordion.apply(this);
-            $('.' + d.config.inputFormClass).submit(function (e) {
+            $(this).find('.kwarque-chat-input').submit(function (e) {
         		e.preventDefault();
-                var messageNode = $($(this).find('.' + d.config.inputMessageClass));
+                var messageNode = $($(this).find('.kwarque-chat-message'));
 		        var m = messageNode.val();
         		messageNode.val("");
 		        d.chat.send(m, d.activeRoom, $.proxy(methods.message, self));
@@ -59,26 +54,26 @@
             return this;
         },
         message: function(msg) {
-            var d = this.data('accChat');
+            var d = this.data('kwarqueChat');
             d.windows[msg.room].container.append(
-                dce('p').text(msg.nick + ': ' + msg.msg)
+                K.dce('p').text(msg.nick + ': ' + msg.msg)
             );
             return this;
         },
 		removeWindow: function (room, callback) {
             callback = callback || $.noop;
 			this.accordion('destroy');
-            var d = this.data('accChat');
+            var d = this.data('kwarqueChat');
 			d.windows[room].header.remove();
 			d.windows[room].container.remove();
             delete d.windows[room];
 			methods.createAccordion.apply(this);
 			d.chat.leave(room, callback);
-            this.data('accChat', d);
+            this.data('kwarqueChat', d);
             return this;
 		},
 		createAccordion: function () {
-            var d = this.data('accChat');
+            var d = this.data('kwarqueChat');
 			this.accordion({
 				active: d.activeRoom ? d.windows[d.activeRoom].pos: 0,
 				change: methods.change,
@@ -88,21 +83,23 @@
             return this;
 		},
 		change: function (event, ui) {
-            var d = $(this).data('accChat');
+            var d = $(this).data('kwarqueChat');
 			$(ui.oldHeader).removeClass(d.config.activeClass);
 			$(ui.newHeader).addClass(d.config.activeClass);
             $.each(d.windows, function(room, elements) {
                 if ($(elements.header).hasClass(d.config.activeClass)) {
                     d.activeRoom = room;
                     return false;
+                } else {
+                    return true;
                 }
             });
-            $(this).data('accChat', d);
+            $(this).data('kwarqueChat', d);
             return this;
 		},
         openWindow: function(room, callback) {
             callback = callback || $.noop;
-            var d = this.data('accChat');
+            var d = this.data('kwarqueChat');
             var el = this;
             if (typeof d.windows[room] !== 'undefined') {
                 var changeCallback = function() {
@@ -122,12 +119,12 @@
         createWindow: function (room, callback) {
             callback = callback || $.noop;
             var el = this;
-            var d = this.data('accChat');
+            var d = this.data('kwarqueChat');
             d.chat.join(room, function(response) {
-                var toggler = dce("a").addClass(d.config.togglerClass);
-		        var container = dce("div").addClass(d.config.containerClass);
-        		var header = dce("div").addClass(d.config.headerClass);
-        		var infoIcon = dce("div").addClass(d.config.infoIconClass);
+                var toggler = K.dce("a").addClass(d.config.togglerClass);
+		        var container = K.dce("div").addClass(d.config.containerClass);
+        		var header = K.dce("div").addClass(d.config.headerClass);
+        		var infoIcon = K.dce("div").addClass(d.config.infoIconClass);
                 header.append(infoIcon);
                 header.append(toggler);
                 var addClasses = function (cls) {
@@ -140,7 +137,6 @@
                 } else if (room.match(/~/)) {
                     // private chat
                     addClasses("private");
-
                 } else {
                     // public chat
                     addClasses("public");
@@ -149,11 +145,11 @@
                 d.windows[room] = {
                     header : header,
                     container : container,
-                    pos : el.children().length / 2
+                    pos : el.find('.' + d.config.headerClass).length
                 }
                 el.append(header);
                 el.append(container);
-                el.data('accChat', d);
+                el.data('kwarqueChat', d);
                 methods.createAccordion.apply(el);
                 callback(response);
             });
@@ -161,16 +157,10 @@
         }
 
 	};
-	$.fn.accChat = function (method) {
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || !method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.accChat');
-		}
-        return this;
+
+    $.fn.kwarqueChat = function () {
+        return K.callPlugin(this, methods, arguments);
 	};
-}) (jQuery);
+}) (KWARQUE, jQuery);
 
 

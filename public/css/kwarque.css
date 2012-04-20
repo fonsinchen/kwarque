@@ -3,6 +3,10 @@
     color: white;
 }
 
+#temlates {
+    display:none;
+}
+
 svg {
     background-color:transparent;
 }
@@ -28,19 +32,16 @@ div div.status div.messages, div div.public div.messages, div div.private div.me
     position:absolute;
     border: 2px solid red;
 }
-.kwarqueChat {
-    height: 90%;
-}
 #map {
     width:69.5%;
     left: 0.5%;
 }
-.chatInput {
-    display:none;
-    position:absolute;
-    bottom:0;
-    width:100%;
-    height:2%;
+.kwarque-chat-input {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 4%;
 }
 .container {
     padding-right: 1%;
@@ -62,14 +63,14 @@ div div._message .data {
 div div.messages {
     background-color:black;
 }
-.chatMessage, .chatSubmit {
+.kwarque-chat-message, .kwarque-chat-submit {
     position:absolute;
 }
-.chatMessage {
+.kwarque-chat-message {
     width: 80%;
     left: 1%;
 }
-.chatSubmit {
+.kwarque-chat-submit {
     width: 17%;
     right: 1%;
 }

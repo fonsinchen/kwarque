@@ -1,87 +1,91 @@
-function KwarqueChat() {
-	this.socket = io.connect();
-	this.nick = null;
-	this.rooms = [];
-	this.roomCallbacks = {};
-	this.globalCallbacks = {};
-    var self = this;
+"use strict";
+(function (K, io) {
+    K.chat = function() {
+        var socket = io.connect();
+        var nick = null;
+        var rooms = [];
+        var roomCallbacks = {};
+        var globalCallbacks = {};
+        var chat = {};
 
-	this.on = function (event, callback) {
-		this.socket.on(event, callback);
-		if (typeof this.globalCallbacks[event] === "undefined") {
-			this.globalCallbacks[event] = [callback];
-		} else {
-			this.globalCallbacks[event].push(callback);
-		}
-	};
+        chat.on = function (event, callback) {
+            socket.on(event, callback);
+            if (typeof globalCallbacks[event] === "undefined") {
+                globalCallbacks[event] = [callback];
+            } else {
+                globalCallbacks[event].push(callback);
+            }
+        };
 
-	this.onRoom = function (event, room, callback) {
-		if (typeof this.roomCallbacks[event] === "undefined") {
-			this.roomCallbacks[event] = {};
-			this.roomCallbacks[event][room] = [callback];
-			this.on(event, function (msg) {
-				for (var room in self.roomCallbacks[event]) {
-					if (room === msg.room && self.roomCallbacks[event].hasOwnProperty(room)) {
-						self.roomCallbacks[event][room](msg);
-					}
-				}
-			});
-		} else if (typeof this.roomCallbacks[event][room] === "undefined") {
-			this.roomCallbacks[event][room] = [callback];
-		} else {
-			this.roomCallbacks[event][room].push(callback);
-		}
-	};
+        chat.onRoom = function (event, room, callback) {
+            if (typeof roomCallbacks[event] === "undefined") {
+                roomCallbacks[event] = {};
+                roomCallbacks[event][room] = [callback];
+                chat.on(event, function (msg) {
+                    for (var room in roomCallbacks[event]) {
+                        if (room === msg.room && roomCallbacks[event].hasOwnProperty(room)) {
+                            roomCallbacks[event][room](msg);
+                        }
+                    }
+                });
+            } else if (typeof roomCallbacks[event][room] === "undefined") {
+                roomCallbacks[event][room] = [callback];
+            } else {
+                roomCallbacks[event][room].push(callback);
+            }
+        };
 
-	this.authenticate = function (nick, password, callback) {
-		this.nick = nick;
-        var doAuth = function () {
-			self.socket.emit('authenticate', {
-                nick : nick,
-                password : password,
-                room : null
+        chat.authenticate = function (newNick, password, callback) {
+            nick = newNick;
+            var doAuth = function () {
+                socket.emit('authenticate', {
+                    nick : nick,
+                    password : password,
+                    room : null
+                }, function (response) {
+                    callback(response);
+                });
+            };
+            if (socket.connected) {
+                doAuth();
+            } else {
+                socket.on('connect', doAuth);
+            }
+        };
+
+        chat.join = function (room, callback) {
+            socket.emit('join', {
+                room: room,
+                nick: nick
             }, function (response) {
-				callback(response);
-			});
-		};
-        if (this.socket.connected) {
-            doAuth();
-        } else {
-    		this.socket.on('connect', doAuth);
-        }
-	};
+                rooms.push(room);
+                callback(response);
+            });
+        };
 
-	this.join = function (room, callback) {
-		this.socket.emit('join', {
-			room: room,
-			nick: self.nick,
-		}, function (response) {
-			self.rooms.push(room);
-			callback(response);
-		});
-	};
+        chat.leave = function (room, callback) {
+            var index = rooms.indexOf(room);
+            if (index !== - 1) {
+                socket.emit('leave', {
+                    room: room,
+                    nick: nick
+                }, function (response) {
+                    rooms.splice(index, 1);
+                    callback(response);
+                });
+            }
+        };
 
-	this.leave = function (room, callback) {
-		var index = self.rooms.indexOf(room);
-		if (index !== - 1) {
-			this.socket.emit('leave', {
-				room: room,
-				nick: self.nick
-			}, function (response) {
-				self.rooms.splice(index, 1);
-				callback(response);
-			});
-		}
-	};
-
-	this.send = function (msg, room, callback) {
-		this.socket.emit("message", {
-			msg: msg,
-			nick: self.nick,
-			room: room
-		}, function (response) {
-			callback(response);
-		});
-	};
-}
+        chat.send = function (msg, room, callback) {
+            socket.emit("message", {
+                msg: msg,
+                nick: nick,
+                room: room
+            }, function (response) {
+                callback(response);
+            });
+        };
+        return chat;
+    }
+})(KWARQUE, io);
 
