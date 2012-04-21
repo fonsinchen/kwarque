@@ -1,6 +1,7 @@
 "use strict";
 
 (function (K, $) {
+
     var methods = {
         init : function() {
             var map = new OpenLayers.Map({div : this[0]});
@@ -14,23 +15,44 @@
             var markers = new OpenLayers.Layer.Markers( "Markers" );
             map.addLayer(markers);
             map.setCenter (lonLat, 16);
-            markers.addMarker(new OpenLayers.Marker(lonLat));   
             this.data('kwarqueMap', {
                 map : map,
-                content : markers
+                markers : markers
             });
             return this;
         },
-        //TODO: functions addMarker/removeMarker instead. Adds a marker, binds 
-        // click handlers to it, opens popup as needed. We cannot bind click
-        // handlers to the content layer.
-        popup : function() {
-            $('#kwarque-map-popup').mapPopup({
-                map: this,
-                contents: function(feature) {
-                    return K.dce('p').text(feature.data.id);
-                }
-            });
+        
+        addMarker : function(content) {
+            var data = this.data('kwarqueMap');
+            var lonLat = new OpenLayers.LonLat(content.lon, content.lat).transform(
+                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                data.map.getProjectionObject() // to Spherical Mercator Projection
+            );
+            
+            var feature = new OpenLayers.Feature(data.markers, lonLat);
+            feature.data = content;
+            
+            var marker = new OpenLayers.Marker(lonLat);
+            marker.feature = feature;
+
+            var markerClick = function(evt) {
+                var widget = $(this.layer.map.div).find('.kwarque-map-popup');
+                widget.find('.kwarque-map-popup-title').text(this.data.title);
+                widget.find('.kwarque-map-popup-text').text(this.data.text);
+                widget.find('.kwarque-map-popup-close').click(function() {
+                    widget.hide();
+                });
+                widget.show();
+                OpenLayers.Event.stop(evt);
+            };
+            marker.events.register("mousedown", feature, markerClick);
+
+            data.markers.addMarker(marker);
+            return this;
+        },
+        
+        removeMarker : function() {
+            
         }
     }
     $.fn.kwarqueMap = function () {

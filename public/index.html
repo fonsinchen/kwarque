@@ -22,7 +22,12 @@
             (function ($) {
                 $(document).ready(function() {
                     $("#map").kwarqueMap();
-                    $("#map").kwarqueMap("popup");
+                    $("#map").kwarqueMap('addMarker', {
+                        lon : 13.41,
+                        lat : 52.52,
+                        title : 'Hello',
+                        text : 'World'
+                    });
                     $("#nick-space").submit(function (e) {
                         e.preventDefault();
                         var nick = $("#nickname").val();
@@ -55,16 +60,18 @@
                 <input name="text" value="" size="50" class="kwarque-chat-message" autocomplete="off">
             </form>
         </div>
-        <div id="map" class="map"></div>
-        <div id="templates">
-            <div id="kwarque-map-popup" class="mq-widget">
-                <div class="mq-popup ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
-                    <span class="ui-dialog-title"></span>
+        <div id="map" class="map">
+            <div class="kwarque-map-popup">
+                <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
+                    <span class="ui-dialog-title kwarque-map-popup-title"></span>
                     <a class="ui-dialog-titlebar-close ui-corner-all" href="#">
-                    <span class="ui-icon ui-icon-closethick">close</span></a>
+                    <span class="ui-icon ui-icon-closethick kwarque-map-popup-close">close</span></a>
                 </div>
-                <div class="ui-dialog-content ui-widget-content"></div>
+                <div class="ui-dialog-content ui-widget-content kwarque-map-popup-text"></div>
             </div>
+        </div>
+        <div id="templates">
+            
         </div>
     </body>
 </html>

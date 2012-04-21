@@ -3,8 +3,16 @@
     color: white;
 }
 
-#templates {
+#templates, .kwarque-map-popup {
     display:none;
+}
+
+.kwarque-map-popup {
+    position: absolute;
+    top: 1%;
+    left: 1%;
+    width: 98%;
+    z-index: 2000;
 }
 
 svg, img, .olLayerDiv div, .olControlPanZoom div {
@@ -93,4 +101,8 @@ div div.messages {
 
 .ui-widget-header, .ui-widget-content {
     background: none repeat scroll 0 0 black;
+}
+
+.ui-widget-content {
+    color: white;
 }
