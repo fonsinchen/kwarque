@@ -5,7 +5,6 @@
             callback = callback || $.noop;
             var self = this;
             this.data('kwarqueChat', {
-            	chat : K.create(K.chat()),
 	            windows : {},
 	            activeRoom : null,
             	config : $.extend({
@@ -21,7 +20,7 @@
             });
             var d = this.data('kwarqueChat');
 
-		    d.chat.authenticate(d.config.nick, d.config.password, function (response1) {
+		    K.chat.authenticate(d.config.nick, d.config.password, function (response1) {
                 d.activeRoom = response1.room;
                 self.data('kwarqueChat', d);
 				methods.createWindow.apply(self, [response1.room, function (response2) {
@@ -30,14 +29,14 @@
                     callback();
                 }]);
 	    	});
-            d.chat.on('message', $.proxy(methods.message, self));
-            d.chat.on('clientJoined', function(msg) {
+            K.chat.on('message', $.proxy(methods.message, self));
+            K.chat.on('clientJoined', function(msg) {
                 methods.message.apply(self, [$.extend(msg, {
                     msg : msg.nick + ' has joined',
                     nick : 'sixth sense'
                 })]);
             });
-            d.chat.on('clientLeft', function(msg) {
+            K.chat.on('clientLeft', function(msg) {
                 methods.message.apply(self, [$.extend(msg, {
                     msg : msg.nick + ' has left',
                     nick : 'sixth sense'
@@ -49,7 +48,7 @@
                 var messageNode = $($(this).find('.kwarque-chat-message'));
 		        var m = messageNode.val();
         		messageNode.val("");
-		        d.chat.send(m, d.activeRoom, $.proxy(methods.message, self));
+		        K.chat.send(m, d.activeRoom, $.proxy(methods.message, self));
         	});
             return this;
         },
@@ -68,7 +67,7 @@
 			d.windows[room].container.remove();
             delete d.windows[room];
 			methods.createAccordion.apply(this);
-			d.chat.leave(room, callback);
+			K.chat.leave(room, callback);
             this.data('kwarqueChat', d);
             return this;
 		},
@@ -120,7 +119,7 @@
             callback = callback || $.noop;
             var el = this;
             var d = this.data('kwarqueChat');
-            d.chat.join(room, function(response) {
+            K.chat.join(room, function(response) {
                 var toggler = K.dce("a").addClass(d.config.togglerClass);
 		        var container = K.dce("div").addClass(d.config.containerClass);
         		var header = K.dce("div").addClass(d.config.headerClass);

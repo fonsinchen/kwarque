@@ -22,6 +22,16 @@
             return this;
         },
         
+        connect : function() {
+            var self = this;
+            K.chat.emit("data", {}, function(result) {
+                for (var i = 0; i < result.rows.length; i++) {
+                    self.kwarqueMap('addMarker', result.rows[i]);
+                }
+            });
+            return this;
+        },
+        
         addMarker : function(content) {
             var data = this.data('kwarqueMap');
             var lonLat = new OpenLayers.LonLat(content.lon, content.lat).transform(
@@ -55,6 +65,7 @@
             
         }
     }
+    
     $.fn.kwarqueMap = function () {
         return K.callPlugin(this, methods, arguments);
 	};

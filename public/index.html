@@ -22,12 +22,12 @@
             (function ($) {
                 $(document).ready(function() {
                     $("#map").kwarqueMap();
-                    $("#map").kwarqueMap('addMarker', {
+                    /*$("#map").kwarqueMap('addMarker', {
                         lon : 13.41,
                         lat : 52.52,
                         title : 'Hello',
                         text : 'World'
-                    });
+                    });*/
                     $("#nick-space").submit(function (e) {
                         e.preventDefault();
                         var nick = $("#nickname").val();
@@ -38,6 +38,7 @@
                             password : ''
                         }, function() {
                             $('.kwarque-chat').kwarqueChat('openWindow', 'global');
+                            $('#map').kwarqueMap('connect');
                         });
                     });
                 });
