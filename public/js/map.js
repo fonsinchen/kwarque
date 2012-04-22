@@ -13,11 +13,13 @@
             );
  
             var markers = new OpenLayers.Layer.Markers( "Markers" );
+            var dialog = $(this).find('.kwarque-map-popup').dialog({autoOpen : false});
             map.addLayer(markers);
             map.setCenter (lonLat, 16);
             this.data('kwarqueMap', {
                 map : map,
-                markers : markers
+                markers : markers,
+                dialog : dialog
             });
             return this;
         },
@@ -46,13 +48,9 @@
             marker.feature = feature;
 
             var markerClick = function(evt) {
-                var widget = $(this.layer.map.div).find('.kwarque-map-popup');
-                widget.find('.kwarque-map-popup-title').text(this.data.title);
-                widget.find('.kwarque-map-popup-text').text(this.data.text);
-                widget.find('.kwarque-map-popup-close').click(function() {
-                    widget.hide();
-                });
-                widget.show();
+                data.dialog.dialog('option', 'title', this.data.title);
+                data.dialog.find('.kwarque-map-popup-text').text(this.data.text);
+                data.dialog.dialog('open');
                 OpenLayers.Event.stop(evt);
             };
             marker.events.register("mousedown", feature, markerClick);

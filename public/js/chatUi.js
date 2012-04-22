@@ -45,7 +45,7 @@
 		    methods.createAccordion.apply(this);
             $(this).find('.kwarque-chat-input').submit(function (e) {
         		e.preventDefault();
-                var messageNode = $($(this).find('.kwarque-chat-message'));
+                var messageNode = $(this).find('.kwarque-chat-message');
 		        var m = messageNode.val();
         		messageNode.val("");
 		        K.chat.send(m, d.activeRoom, $.proxy(methods.message, self));
