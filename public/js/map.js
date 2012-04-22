@@ -22,7 +22,6 @@
             map.setCenter (lonLat, 16);
             var clickHandler = new OpenLayers.Handler.Click({'map': map}, {
                 'click': function(evt) {
-                    //get ur coords
                     var lonlat = map.getLonLatFromViewPortPx(evt.xy).transform(
                         map.getProjectionObject(),
                         new OpenLayers.Projection("EPSG:4326")
@@ -30,7 +29,6 @@
                     input.find('.kwarque-map-input-lon').val(lonlat.lon);
                     input.find('.kwarque-map-input-lat').val(lonlat.lat);
                     input.dialog('open');
-                    //deactivate it
                     clickHandler.deactivate();
                 }
             });
