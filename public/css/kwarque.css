@@ -87,6 +87,8 @@ div div.messages {
 }
 #nick-space label {
     min-width: 17%;
+    float: left;
+    margin-top: 1%;
 }
 #nick-space input {
     margin-top: 1%;
@@ -97,12 +99,4 @@ div div.messages {
 }
 #nickname, #room {
     width: 80%;
-}
-
-.ui-widget-header, .ui-widget-content {
-    background: none repeat scroll 0 0 black;
-}
-
-.ui-widget-content {
-    color: white;
 }
