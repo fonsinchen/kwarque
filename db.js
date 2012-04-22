@@ -19,12 +19,35 @@
                 });
             });
         },
+        
+        insertFragment : function(data, fn) {
+            db.connect(config, function(err, client) {
+                client.query({
+                    name : 'insert fragment',
+                    text : "INSERT INTO fragment (location, title, text) VALUES (POINT($1, $2), $3, $4)",
+                    values : [data.lon, data.lat, data.title, data.text]
+                }, fn);
+            })
+        },
 
         serve : function(client) {
-            client.on("data", function(select, fn) {
+            /**
+             * watch an area on the map.
+             */
+            client.on("watch", function(select, fn) {
                 K.db.getFragments(select.timestamp, select.area, function(result) {
                     fn(result);
                 });
+            });
+            /**
+             * ignore an area on the map
+             */
+            client.on("ignore", function(select, fn) {
+                
+            });
+            
+            client.on("insert", function(data, fn) {
+                K.db.insertFragment(data, fn);
             });
         }
     }

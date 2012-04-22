@@ -1,4 +1,4 @@
-body, input {
+body, input, textarea {
     background-color: black;
     color: white;
 }
@@ -98,4 +98,12 @@ div div.messages {
 }
 #nickname, #room {
     width: 80%;
+}
+
+button.kwarque-map-add {
+    color: #880000;
+    position: absolute;
+    right: 1%;
+    top: 1%;
+    z-index: 1005;
 }

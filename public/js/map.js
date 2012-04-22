@@ -14,23 +14,62 @@
  
             var markers = new OpenLayers.Layer.Markers( "Markers" );
             var dialog = $(this).find('.kwarque-map-popup').dialog({autoOpen : false});
+            var input = $(this).find('.kwarque-map-input').dialog({
+                title : "write new fragment",
+                autoOpen : false
+            });
             map.addLayer(markers);
             map.setCenter (lonLat, 16);
+            var clickHandler = new OpenLayers.Handler.Click({'map': map}, {
+                'click': function(evt) {
+                    //get ur coords
+                    var lonlat = map.getLonLatFromViewPortPx(evt.xy).transform(
+                        map.getProjectionObject(),
+                        new OpenLayers.Projection("EPSG:4326")
+                    );
+                    input.find('.kwarque-map-input-lon').val(lonlat.lon);
+                    input.find('.kwarque-map-input-lat').val(lonlat.lat);
+                    input.dialog('open');
+                    //deactivate it
+                    clickHandler.deactivate();
+                }
+            });
+            $(this).find('.kwarque-map-add').button().click(function() {
+                clickHandler.activate();
+            });
             this.data('kwarqueMap', {
                 map : map,
                 markers : markers,
-                dialog : dialog
+                dialog : dialog,
+                input : input
             });
             return this;
         },
         
         connect : function() {
             var self = this;
-            K.chat.emit("data", {}, function(result) {
+            K.chat.emit("watch", {}, function(result) {
                 for (var i = 0; i < result.rows.length; i++) {
                     self.kwarqueMap('addMarker', result.rows[i]);
                 }
             });
+            var data = this.data("kwarqueMap");
+            data.input.find('form').submit(function(e) {
+                e.preventDefault();
+                var el = $(this);
+                var content = {
+                    type : "fragment",
+                    lon : el.find('.kwarque-map-input-lon').val(),
+                    lat : el.find('.kwarque-map-input-lat').val(),
+                    title : el.find('.kwarque-map-input-title').val(),
+                    text : el.find('.kwarque-map-input-text').val()
+                };
+                K.chat.emit("insert", content, function() {
+                    self.kwarqueMap('addMarker', content);
+                    el.find('.kwarque-map-input-title, .kwarque-map-input-text').val('');
+                    data.input.dialog('close');
+                });
+            })
             return this;
         },
         
