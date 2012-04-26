@@ -1,34 +1,33 @@
 "use strict";
 (function (K, $) {
-	var methods = {
+    var methods = {
         init: function (uconfig, callback) {
             callback = callback || $.noop;
             var self = this;
             this.data('kwarqueChat', {
-	            windows : {},
-	            activeRoom : null,
-            	config : $.extend({
-		            activeClass: 'active',
-            		headerClass: 'header',
+                windows : {},
+                activeRoom : null,
+                config : $.extend({
+                    activeClass: 'active',
+                    headerClass: 'header',
                     togglerClass: 'toggler',
                     infoIconClass: 'infoIcon',
                     privateClass: 'private',
                     publicClass: 'public',
                     statusClass: 'status',
                     containerClass: 'container'
-            	}, uconfig)
+                }, uconfig)
             });
             var d = this.data('kwarqueChat');
 
-		    K.chat.authenticate(d.config.nick, d.config.password, function (response1) {
-                d.activeRoom = response1.room;
+            K.chat.authenticate(d.config.nick, d.config.password, function (response) {
+                d.activeRoom = response.room;
                 self.data('kwarqueChat', d);
-				methods.createWindow.apply(self, [response1.room, function (response2) {
-                    methods.message.apply(self, [response1]);
-                    methods.message.apply(self, [response2]);
+                methods.openWindow.apply(self, [response.room, function () {
+                    methods.message.apply(self, [response]);
                     callback();
                 }]);
-	    	});
+            });
             K.chat.on('message', $.proxy(methods.message, self));
             K.chat.on('clientJoined', function(msg) {
                 methods.message.apply(self, [$.extend(msg, {
@@ -42,49 +41,52 @@
                     nick : 'sixth sense'
                 })]);
             });
-		    methods.createAccordion.apply(this);
+            methods.createAccordion.apply(this);
             $(this).find('.kwarque-chat-input').submit(function (e) {
-        		e.preventDefault();
+                e.preventDefault();
                 var messageNode = $(this).find('.kwarque-chat-message');
-		        var m = messageNode.val();
-        		messageNode.val("");
-		        K.chat.send(m, d.activeRoom, $.proxy(methods.message, self));
-        	});
+                var m = messageNode.val();
+                messageNode.val("");
+                K.chat.send(m, d.activeRoom, $.proxy(methods.message, self));
+            });
+            K.on("fragmentOpened", function(id) {
+                methods.openWindow.apply(self, ["@fragment" + id]);
+            });
             return this;
         },
         message: function(msg) {
             var d = this.data('kwarqueChat');
             d.windows[msg.room].container.append(
                 K.dce('p').text(msg.nick + ': ' + msg.msg)
-            );
+                );
             return this;
         },
-		removeWindow: function (room, callback) {
+        removeWindow: function (room, callback) {
             callback = callback || $.noop;
-			this.accordion('destroy');
+            this.accordion('destroy');
             var d = this.data('kwarqueChat');
-			d.windows[room].header.remove();
-			d.windows[room].container.remove();
+            d.windows[room].header.remove();
+            d.windows[room].container.remove();
             delete d.windows[room];
-			methods.createAccordion.apply(this);
-			K.chat.leave(room, callback);
+            methods.createAccordion.apply(this);
+            K.chat.leave(room, callback);
             this.data('kwarqueChat', d);
             return this;
-		},
-		createAccordion: function () {
+        },
+        createAccordion: function () {
             var d = this.data('kwarqueChat');
-			this.accordion({
-				active: d.activeRoom ? d.windows[d.activeRoom].pos: 0,
-				change: methods.change,
-				header: 'div.' + d.config.headerClass,
+            this.accordion({
+                active: d.activeRoom ? d.windows[d.activeRoom].pos: 0,
+                change: methods.change,
+                header: 'div.' + d.config.headerClass,
                 autoHeight: false
-			});
+            });
             return this;
-		},
-		change: function (event, ui) {
+        },
+        change: function (event, ui) {
             var d = $(this).data('kwarqueChat');
-			$(ui.oldHeader).removeClass(d.config.activeClass);
-			$(ui.newHeader).addClass(d.config.activeClass);
+            $(ui.oldHeader).removeClass(d.config.activeClass);
+            $(ui.newHeader).addClass(d.config.activeClass);
             $.each(d.windows, function(room, elements) {
                 if ($(elements.header).hasClass(d.config.activeClass)) {
                     d.activeRoom = room;
@@ -95,7 +97,7 @@
             });
             $(this).data('kwarqueChat', d);
             return this;
-		},
+        },
         openWindow: function(room, callback) {
             callback = callback || $.noop;
             var d = this.data('kwarqueChat');
@@ -111,6 +113,7 @@
                 methods.createWindow.apply(el, [room, function(msg) {
                     methods.message.apply(el, [msg]);
                     el.accordion("activate", d.windows[room].pos);
+                    callback();
                 }]);
             }
             return this;
@@ -121,9 +124,9 @@
             var d = this.data('kwarqueChat');
             K.chat.join(room, function(response) {
                 var toggler = K.dce("a").addClass(d.config.togglerClass);
-		        var container = K.dce("div").addClass(d.config.containerClass);
-        		var header = K.dce("div").addClass(d.config.headerClass);
-        		var infoIcon = K.dce("div").addClass(d.config.infoIconClass);
+                var container = K.dce("div").addClass(d.config.containerClass);
+                var header = K.dce("div").addClass(d.config.headerClass);
+                var infoIcon = K.dce("div").addClass(d.config.infoIconClass);
                 header.append(infoIcon);
                 header.append(toggler);
                 var addClasses = function (cls) {
@@ -155,11 +158,11 @@
             return this;
         }
 
-	};
+    };
 
     $.fn.kwarqueChat = function () {
         return K.callPlugin(this, methods, arguments);
-	};
+    };
 }) (KWARQUE, jQuery);
 
 

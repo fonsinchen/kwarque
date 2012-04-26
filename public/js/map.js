@@ -88,6 +88,7 @@
                 data.dialog.dialog('option', 'title', this.data.title);
                 data.dialog.find('.kwarque-map-popup-text').text(this.data.text);
                 data.dialog.dialog('open');
+                K.emit('fragmentOpened', this.data.id);
                 OpenLayers.Event.stop(evt);
             };
             marker.events.register("mousedown", feature, markerClick);
