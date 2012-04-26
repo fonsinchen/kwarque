@@ -14,7 +14,6 @@
         getFragments : function(timestamp, area, fn) {
             db.connect(config, function(err, client) {
                 client.query("SELECT location[0] AS lon, location[1] AS lat, title, text FROM fragment", function(err, result) {
-                    console.log(err);
                     fn(result);
                 });
             });
