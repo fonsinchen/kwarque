@@ -32,4 +32,30 @@ var KWARQUE = {};
         });
         return ret || elements;
     };
+
+    var handlers = {};
+    K.on = function (event, callback) {
+        if (handlers[event]) {
+            handlers[event].push(callback);
+        } else {
+            handlers[event] = [callback];
+        }
+    };
+
+    K.un = function (event, callback) {
+        $.each(handlers[event], function (i, handler) {
+            if (callback === handler) {
+                handlers.splice(i, 1);
+                return false;
+            } else {
+                return true;
+            }
+        });
+    }
+
+    K.emit = function (event, data) {
+        $.each(handlers[event], function(i, handler) {
+            handler(data);
+        });
+    }
 })(KWARQUE, jQuery);
