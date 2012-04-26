@@ -20,6 +20,7 @@
             (function ($) {
                 $(document).ready(function() {
                     $("#map").kwarqueMap();
+                    $('#map').kwarqueMap('connect');
                     /*$("#map").kwarqueMap('addMarker', {
                         lon : 13.41,
                         lat : 52.52,
@@ -36,7 +37,6 @@
                             password : ''
                         }, function() {
                             $('.kwarque-chat').kwarqueChat('openWindow', 'global');
-                            $('#map').kwarqueMap('connect');
                         });
                     });
                 });

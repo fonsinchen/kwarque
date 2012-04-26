@@ -1,6 +1,6 @@
 "use strict";
 (function (K, io) {
-    var socket = null;
+    var socket = io.connect();
     var nick = null;
     var rooms = [];
     var roomCallbacks = {};
@@ -40,17 +40,13 @@
 
     K.chat.authenticate = function (newNick, password, callback) {
         nick = newNick;
-        var doAuth = function () {
-            socket.emit('authenticate', {
-                nick : nick,
-                password : password,
-                room : null
-            }, function (response) {
-                callback(response);
-            });
-        };
-        socket = io.connect();
-        socket.on('connect', doAuth);
+        socket.emit('authenticate', {
+            nick : nick,
+            password : password,
+            room : null
+        }, function (response) {
+            callback(response);
+        });
     };
 
     K.chat.join = function (room, callback) {
