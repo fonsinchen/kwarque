@@ -2,6 +2,37 @@
 
 (function (K) {
     var io = require('socket.io').listen(K.app);
+    
+    /* remember nick of disconnecting clients */
+    var disconnectingNick = null;
+    var superDisconnect = io.onClientDisconnect;
+    io.onClientDisconnect = function(id, reason) {
+        var client = io.sockets.socket(id)
+        disconnectingNick = client && client.nick;
+        superDisconnect.apply(io, [id, reason]);
+        disconnectingNick = null;
+    };
+
+    /* hook into onJoin and onLeave to generate messages for respective rooms */
+    var overrideHandler = function (name, eventName) {
+        var superHandler = io[name];
+        io[name] = function(id, room) {
+            superHandler.apply(io, [id, room]);
+            room = room.split('/');
+            room = room[room.length - 1];
+            var client = io.sockets.socket(id)
+            var nick = (client && client.nick) || disconnectingNick;
+            if (room && nick) {
+                io.sockets["in"](room).except(id).emit(eventName, {
+                    nick: nick,
+                    room: room
+                });
+            }
+        }
+    };
+    overrideHandler('onJoin', 'clientJoined');
+    overrideHandler('onLeave', 'clientLeft');
+
     var redis = require('socket.io/node_modules/redis');
 
     io.configure(function () {
@@ -14,8 +45,6 @@
     });
 
     io.sockets.on('connection', function (client) {
-        var i = 0;
-        client.rooms = [];
         client.nick = "";
 
         client.on("authenticate", function (login, fn) {
@@ -28,29 +57,16 @@
         });
 
         client.on("join", function (msg, fn) {
-            client.rooms.push(msg.room);
             client.join(msg.room);
             fn({
                 msg: "Welcome to " + msg.room,
                 nick: "kwarque",
                 room: msg.room
             });
-            client.broadcast.to(msg.room).json.emit('clientJoined', {
-                nick: client.nick,
-                room: msg.room
-            });
         });
 
         client.on('leave', function (msg, fn) {
-            var index = client.rooms.indexOf(msg.room);
-            if (index !== -1) {
-                client.rooms.splice(index, 1);
-                client.leave(msg.room);
-                client.broadcast.to(msg.room).json.emit('clientLeft', {
-                    nick: client.nick,
-                    room: msg.room
-                });
-            }
+            client.leave(msg.room);
             fn({
                 msg: "Goodbye",
                 nick: "kwarque",
@@ -63,14 +79,6 @@
             fn(msg);
         });
 
-        client.on('disconnect', function () {
-            for (i = 0; i < client.rooms.length; ++i) {
-                client.broadcast.to(client.rooms[i]).json.emit('clientLeft', {
-                    nick: client.nick,
-                    room: client.rooms[i]
-                });
-            }
-        });
         K.db.serve(client);
     });
 })(process.KWARQUE);
