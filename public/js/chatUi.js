@@ -12,6 +12,7 @@
                     headerClass: 'header',
                     togglerClass: 'toggler',
                     infoIconClass: 'infoIcon',
+                    closeIconClass: 'closeIcon',
                     privateClass: 'private',
                     publicClass: 'public',
                     statusClass: 'status',
@@ -126,9 +127,14 @@
                 var toggler = K.dce("a").addClass(d.config.togglerClass);
                 var container = K.dce("div").addClass(d.config.containerClass);
                 var header = K.dce("div").addClass(d.config.headerClass);
-                var infoIcon = K.dce("div").addClass(d.config.infoIconClass);
-                header.append(infoIcon);
+                var infoIcon = K.dce("span").addClass(d.config.infoIconClass);
+                var closeIcon = K.dce("span").addClass(d.config.closeIconClass);
+                closeIcon.click(function() {
+                    methods.removeWindow.apply(el, [room]);
+                });
                 header.append(toggler);
+                header.append(infoIcon);
+                header.append(closeIcon);
                 var addClasses = function (cls) {
                     header.addClass(d.config[cls + 'Class']);
                     container.addClass(d.config[cls + 'Class']);
