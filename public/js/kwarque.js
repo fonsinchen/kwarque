@@ -54,8 +54,10 @@ var KWARQUE = {};
     }
 
     K.emit = function (event, data) {
-        $.each(handlers[event], function(i, handler) {
-            handler(data);
-        });
+        if (typeof handlers[event] === 'object') {
+            $.each(handlers[event], function(i, handler) {
+                handler(data);
+            });
+        }
     }
 })(KWARQUE, jQuery);

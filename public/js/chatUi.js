@@ -69,6 +69,7 @@
             d.windows[room].header.remove();
             d.windows[room].container.remove();
             delete d.windows[room];
+            if (room === d.activeRoom) d.activeRoom = 0;
             methods.createAccordion.apply(this);
             K.chat.leave(room, callback);
             this.data('kwarqueChat', d);
@@ -128,7 +129,9 @@
                 var container = K.dce("div").addClass(d.config.containerClass);
                 var header = K.dce("div").addClass(d.config.headerClass);
                 var infoIcon = K.dce("span").addClass(d.config.infoIconClass);
-                var closeIcon = K.dce("span").addClass(d.config.closeIconClass);
+                
+                var closeIcon = K.dce("a").addClass(d.config.closeIconClass);
+                closeIcon.append(K.dce('span'));
                 closeIcon.click(function() {
                     methods.removeWindow.apply(el, [room]);
                 });
