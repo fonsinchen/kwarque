@@ -109,18 +109,13 @@ button.kwarque-map-add {
 }
 
 
-div.header a.closeIcon {
+div.header span.closeIcon {
     position:absolute;
-    right:0.3em;
-    width:19px;
-    height:18px;
-    padding:1px;
-    top:0;
-}
-
-a.closeIcon span {
-    display:block;
-    margin:1px;
+    right:0.1em;
+    width:16px;
+    height:16px;
+    margin-top:-8px;
+    top:50%;
     width:16px;
     height:16px;
     background-image:url(images/ui-icons_880000_256x240.png);

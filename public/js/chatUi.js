@@ -130,8 +130,7 @@
                 var header = K.dce("div").addClass(d.config.headerClass);
                 var infoIcon = K.dce("span").addClass(d.config.infoIconClass);
                 
-                var closeIcon = K.dce("a").addClass(d.config.closeIconClass);
-                closeIcon.append(K.dce('span'));
+                var closeIcon = K.dce("span").addClass(d.config.closeIconClass);
                 closeIcon.click(function() {
                     methods.removeWindow.apply(el, [room]);
                 });
