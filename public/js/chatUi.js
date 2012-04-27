@@ -72,7 +72,7 @@
             d.windows[room].header.remove();
             d.windows[room].container.remove();
             delete d.windows[room];
-            if (room === d.activeRoom) d.activeRoom = 0;
+            if (room === d.activeRoom) d.activeRoom = '~' + d.config.nick;
             methods.createAccordion.apply(this);
             K.chat.leave(room, callback);
             this.data('kwarqueChat', d);
