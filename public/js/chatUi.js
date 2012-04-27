@@ -58,8 +58,11 @@
         message: function(msg) {
             var d = this.data('kwarqueChat');
             var container = d.windows[msg.room].container;
+            var bottom = container.prop('scrollHeight') - container.innerHeight() - container.scrollTop();
             container.append(K.dce('p').text(msg.nick + ': ' + msg.msg));
-            container.scrollTop(container.prop('scrollHeight') - container.height());
+            if (bottom === 0) {
+                container.scrollTop(container.prop('scrollHeight') - container.innerHeight());
+            }
             return this;
         },
         removeWindow: function (room, callback) {
