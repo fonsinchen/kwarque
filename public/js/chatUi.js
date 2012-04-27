@@ -57,9 +57,9 @@
         },
         message: function(msg) {
             var d = this.data('kwarqueChat');
-            d.windows[msg.room].container.append(
-                K.dce('p').text(msg.nick + ': ' + msg.msg)
-                );
+            var container = d.windows[msg.room].container;
+            container.append(K.dce('p').text(msg.nick + ': ' + msg.msg));
+            container.scrollTop(container.prop('scrollHeight') - container.height());
             return this;
         },
         removeWindow: function (room, callback) {
