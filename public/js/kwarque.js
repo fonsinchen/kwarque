@@ -45,7 +45,7 @@ var KWARQUE = {};
     K.un = function (event, callback) {
         $.each(handlers[event], function (i, handler) {
             if (callback === handler) {
-                handlers.splice(i, 1);
+                handlers[event].splice(i, 1);
                 return false;
             } else {
                 return true;
