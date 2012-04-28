@@ -46,10 +46,11 @@
         
         connect : function() {
             var self = this;
-            K.chat.emit("watch", {}, function(result) {
-                for (var i = 0; i < result.rows.length; i++) {
-                    self.kwarqueMap('addMarker', result.rows[i]);
-                }
+            K.chat.on("fragment", function(row) {
+                self.kwarqueMap('addMarker', row);
+            });
+            K.chat.emit("watch", {}, function(status) {
+                if (status === 'error') console.log('db error, needs handling');
             });
             var data = this.data("kwarqueMap");
             data.input.find('form').submit(function(e) {
