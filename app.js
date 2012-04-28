@@ -1,11 +1,9 @@
 "use strict";
 
-process.KWARQUE = {};
+var kwarque = require('kwarque');
+var db = require('db');
+var chat = require('chat');
 
-require('./db.js');
-require('./static.js');
-require('./chat.js');
-
-process.KWARQUE.app.listen(8000);
+kwarque.app.listen(8000);
 
 
