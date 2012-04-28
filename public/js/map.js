@@ -7,10 +7,7 @@
             var map = new OpenLayers.Map({div : this[0]});
             map.addLayer(new OpenLayers.Layer.OSM());
  
-            var lonLat = new OpenLayers.LonLat(13.41,52.52).transform(
-                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                map.getProjectionObject() // to Spherical Mercator Projection
-            );
+            var lonLat = new OpenLayers.LonLat(1495588,6888577);
  
             var markers = new OpenLayers.Layer.Markers( "Markers" );
             var dialog = $(this).find('.kwarque-map-popup').dialog({autoOpen : false});
@@ -22,10 +19,7 @@
             map.setCenter (lonLat, 16);
             var clickHandler = new OpenLayers.Handler.Click({'map': map}, {
                 'click': function(evt) {
-                    var lonlat = map.getLonLatFromViewPortPx(evt.xy).transform(
-                        map.getProjectionObject(),
-                        new OpenLayers.Projection("EPSG:4326")
-                    );
+                    var lonlat = map.getLonLatFromViewPortPx(evt.xy);
                     input.find('.kwarque-map-input-lon').val(lonlat.lon);
                     input.find('.kwarque-map-input-lat').val(lonlat.lat);
                     input.dialog('open');
@@ -74,10 +68,7 @@
         
         addMarker : function(content) {
             var data = this.data('kwarqueMap');
-            var lonLat = new OpenLayers.LonLat(content.lon, content.lat).transform(
-                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                data.map.getProjectionObject() // to Spherical Mercator Projection
-            );
+            var lonLat = new OpenLayers.LonLat(content.lon, content.lat);
             
             var feature = new OpenLayers.Feature(data.markers, lonLat);
             feature.data = content;
