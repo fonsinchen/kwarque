@@ -4,7 +4,20 @@
 
     var methods = {
         init : function() {
-            var map = new OpenLayers.Map({div : this[0]});
+            var map = new OpenLayers.Map({
+                div : this[0],
+                eventListeners : {
+                    moveend : function() {
+                        var extent = map.getExtent();
+                        K.chat.emit("watch", {
+                            lon : K.raster.rasterize("lon", extent.left, extent.right),
+                            lat : K.raster.rasterize("lat", extent.bottom, extent.top)
+                        }, function(status) {
+                            if (status === 'error') console.log('db error, needs handling');
+                        });
+                    }
+                }
+            });
             map.addLayer(new OpenLayers.Layer.OSM());
  
             var lonLat = new OpenLayers.LonLat(1495588,6888577);
@@ -44,13 +57,7 @@
                 self.kwarqueMap('addMarker', row);
             });
             var data = this.data("kwarqueMap");
-            var extent = data.map.getExtent();
-            K.chat.emit("watch", {
-                lon : K.raster.rasterize("lon", extent.left, extent.right),
-                lat : K.raster.rasterize("lat", extent.bottom, extent.top)
-            }, function(status) {
-                if (status === 'error') console.log('db error, needs handling');
-            });
+            
             data.input.find('form').submit(function(e) {
                 e.preventDefault();
                 var el = $(this);
