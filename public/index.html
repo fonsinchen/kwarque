@@ -13,7 +13,7 @@
         <script src="js/chat.js" type="text/javascript"></script>
         <script src="js/chatUi.js" type="text/javascript"></script>
         <script src="js/map.js" type="text/javascript"></script>
-        <script src="js/mapPopup.js" type="text/javascript"></script>
+        <script src="js/raster.js" type="text/javascript"></script>
 
 
         <script type="text/javascript">
@@ -21,12 +21,6 @@
                 $(document).ready(function() {
                     $("#map").kwarqueMap();
                     $('#map').kwarqueMap('connect');
-                    /*$("#map").kwarqueMap('addMarker', {
-                        lon : 13.41,
-                        lat : 52.52,
-                        title : 'Hello',
-                        text : 'World'
-                    });*/
                     $("#nick-space").submit(function (e) {
                         e.preventDefault();
                         var nick = $("#nickname").val();

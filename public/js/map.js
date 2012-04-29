@@ -57,10 +57,15 @@
                     title : el.find('.kwarque-map-input-title').val(),
                     text : el.find('.kwarque-map-input-text').val()
                 };
-                K.chat.emit("insert", content, function() {
-                    self.kwarqueMap('addMarker', content);
-                    el.find('.kwarque-map-input-title, .kwarque-map-input-text').val('');
-                    data.input.dialog('close');
+                K.chat.emit("insert", content, function(result, id) {
+                    if (result === 'end') {
+                        content.id = id;
+                        self.kwarqueMap('addMarker', content);
+                        el.find('.kwarque-map-input-title, .kwarque-map-input-text').val('');
+                        data.input.dialog('close');
+                    } else {
+                        // TODO: handle error
+                    }
                 });
             })
             return this;
