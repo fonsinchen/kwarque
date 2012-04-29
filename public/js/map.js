@@ -43,10 +43,14 @@
             K.chat.on("fragment", function(row) {
                 self.kwarqueMap('addMarker', row);
             });
-            K.chat.emit("watch", {}, function(status) {
+            var data = this.data("kwarqueMap");
+            var extent = data.map.getExtent();
+            K.chat.emit("watch", {
+                lon : K.raster.rasterize("lon", extent.left, extent.right),
+                lat : K.raster.rasterize("lat", extent.bottom, extent.top)
+            }, function(status) {
                 if (status === 'error') console.log('db error, needs handling');
             });
-            var data = this.data("kwarqueMap");
             data.input.find('form').submit(function(e) {
                 e.preventDefault();
                 var el = $(this);

@@ -3,11 +3,11 @@
 
 (function (K) {
 var raster = {
-    x : {
+    lon : {
         min : -20037508,
         max : 20037508,
         levels: []
-    }, y : {
+    }, lat : {
         min : -20037508,
         max : 20037508,
         levels: []
