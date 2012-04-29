@@ -37,8 +37,15 @@ for (var type in raster) {
 var exports = {};
 exports.rasterize = function(type, a, b) {
     type = raster[type];
-    var prevA = a;
+
+    if (a > type.max) a = type.max;
+    if (a < type.min) a = type.min;
+    if (b > type.max) b = type.max;
+    if (b < type.min) b = type.min;
+    
+    var prevA = a;    
     var prevB = b;
+
     var i = 1;
     for (; i < type.levels.length; ++i) {
         var offsetA = Math.floor(a / type.levels[i]);
@@ -74,11 +81,3 @@ exports.transform = function(type, intervals, targetLevel) {
 K.raster = exports;
 
 })(KWARQUE)
-/*console.log(exports.rasterize('x', 401290, 408949));
-console.log(exports.rasterize('y', 401290, 401310));
-var r1 = exports.rasterize('t', -200, 40000);
-var r2 = exports.transform('t', r1, 20);
-var r3 = exports.transform('t', r2, r1.level);
-console.log(r1);
-console.log(r2);
-console.log(r3);*/
