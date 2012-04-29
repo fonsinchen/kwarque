@@ -30,6 +30,7 @@
                 }]);
             });
             K.chat.on('message', $.proxy(methods.message, self));
+            
             K.chat.on('clientJoined', function(msg) {
                 methods.message.apply(self, [$.extend(msg, {
                     msg : msg.nick + ' has joined',
@@ -57,11 +58,13 @@
         },
         message: function(msg) {
             var d = this.data('kwarqueChat');
-            var container = d.windows[msg.room].container;
-            var bottom = container.prop('scrollHeight') - container.innerHeight() - container.scrollTop();
-            container.append(K.dce('p').text(msg.nick + ': ' + msg.msg));
-            if (bottom === 0) {
-                container.scrollTop(container.prop('scrollHeight') - container.innerHeight());
+            if (msg.room in d.windows) {
+                var container = d.windows[msg.room].container;
+                var bottom = container.prop('scrollHeight') - container.innerHeight() - container.scrollTop();
+                container.append(K.dce('p').text(msg.nick + ': ' + msg.msg));
+                if (bottom === 0) {
+                    container.scrollTop(container.prop('scrollHeight') - container.innerHeight());
+                }
             }
             return this;
         },
