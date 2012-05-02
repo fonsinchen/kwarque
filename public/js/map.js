@@ -1,19 +1,33 @@
 "use strict";
 
 (function (K, $) {
+    var dimensions = {
+        x : -20037508.34,
+        y : -20037508.34,
+        w : 20037508.34 * 2,
+        h : 20037508.34 * 2
+    }
 
     var methods = {
         init : function() {
+            var treeparams = K.create(dimensions);
+            treeparams.maxDepth = 16;
+            treeparams.maxChildren = 128;
+            var tree = K.quadtree.init(treeparams)
             var map = new OpenLayers.Map({
                 div : this[0],
                 eventListeners : {
                     moveend : function() {
                         var extent = map.getExtent();
-                        K.chat.emit("watch", {
-                            lon : K.raster.rasterize("lon", extent.left, extent.right),
-                            lat : K.raster.rasterize("lat", extent.bottom, extent.top)
-                        }, function(status) {
-                            if (status === 'error') console.log('db error, needs handling');
+                        tree.prepare({
+                            x : extent.left,
+                            y : extent.bottom,
+                            w : extent.right - extent.left,
+                            h : extent.top - extent.bottom
+                        }, function(node) {
+                            K.chat.emit("watch", node, function(status) {
+                                if (status === 'error') console.log('db error, needs handling');
+                            });
                         });
                     }
                 }
