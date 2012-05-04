@@ -77,8 +77,8 @@
                 var el = $(this);
                 var content = {
                     type : "fragment",
-                    lon : el.find('.kwarque-map-input-lon').val(),
-                    lat : el.find('.kwarque-map-input-lat').val(),
+                    x : el.find('.kwarque-map-input-lon').val(),
+                    y : el.find('.kwarque-map-input-lat').val(),
                     title : el.find('.kwarque-map-input-title').val(),
                     text : el.find('.kwarque-map-input-text').val()
                 };
@@ -98,7 +98,7 @@
         
         addMarker : function(content) {
             var data = this.data('kwarqueMap');
-            var lonLat = new OpenLayers.LonLat(content.lon, content.lat);
+            var lonLat = new OpenLayers.LonLat(content.x, content.y);
             
             var feature = new OpenLayers.Feature(data.markers, lonLat);
             feature.data = content;
