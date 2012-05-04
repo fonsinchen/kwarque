@@ -24,10 +24,11 @@
             K.chat.authenticate(d.config.nick, d.config.password, function (response) {
                 d.activeRoom = response.room;
                 self.data('kwarqueChat', d);
-                methods.openWindow.apply(self, [response.room, function () {
-                    methods.message.apply(self, [response]);
+                response.title = 'status';
+                methods.openWindow.call(self, response, function () {
+                    methods.message.call(self, response);
                     callback();
-                }]);
+                });
             });
             K.chat.on('message', $.proxy(methods.message, self));
             
@@ -51,8 +52,9 @@
                 messageNode.val("");
                 K.chat.send(m, d.activeRoom, $.proxy(methods.message, self));
             });
-            K.on("fragmentOpened", function(id) {
-                methods.openWindow.apply(self, ["@fragment" + id]);
+            K.on("fragmentOpened", function(fragment) {
+                fragment.room = "@fragment" + fragment.id;
+                methods.openWindow.call(self, fragment);
             });
             return this;
         },
@@ -110,19 +112,19 @@
             callback = callback || $.noop;
             var d = this.data('kwarqueChat');
             var el = this;
-            if (typeof d.windows[room] !== 'undefined') {
+            if (typeof d.windows[room.room] !== 'undefined') {
                 var changeCallback = function() {
                     el.unbind("accordionchange", changeCallback);
                     callback();
                 };
                 el.bind("accordionchange", changeCallback);
-                el.accordion("activate", d.windows[room].pos);
+                el.accordion("activate", d.windows[room.room].pos);
             } else {
-                methods.createWindow.apply(el, [room, function(msg) {
-                    methods.message.apply(el, [msg]);
-                    el.accordion("activate", d.windows[room].pos);
+                methods.createWindow.call(el, room, function(msg) {
+                    methods.message.call(el, msg);
+                    el.accordion("activate", d.windows[room.room].pos);
                     callback();
-                }]);
+                });
             }
             return this;
         },
@@ -130,15 +132,15 @@
             callback = callback || $.noop;
             var el = this;
             var d = this.data('kwarqueChat');
-            K.chat.join(room, function(response) {
-                var toggler = K.dce("a").addClass(d.config.togglerClass);
+            K.chat.join(room.room, function(response) {
+                var toggler = K.dce("a").addClass(d.config.togglerClass).text(room.title);
                 var container = K.dce("div").addClass(d.config.containerClass);
                 var header = K.dce("div").addClass(d.config.headerClass);
                 var infoIcon = K.dce("span").addClass(d.config.infoIconClass);
                 
                 var closeIcon = K.dce("span").addClass(d.config.closeIconClass);
                 closeIcon.click(function() {
-                    methods.removeWindow.apply(el, [room]);
+                    methods.removeWindow.call(el, room.room);
                 });
                 header.append(toggler);
                 header.append(infoIcon);
@@ -147,10 +149,10 @@
                     header.addClass(d.config[cls + 'Class']);
                     container.addClass(d.config[cls + 'Class']);
                 }
-                if (room === '~' + d.nick) {
+                if (room.room === '~' + d.nick) {
                     // status
                     addClasses("status");
-                } else if (room.match(/~/)) {
+                } else if (room.room.match(/~/)) {
                     // private chat
                     addClasses("private");
                 } else {
@@ -158,7 +160,7 @@
                     addClasses("public");
                 }
                 el.accordion('destroy');
-                d.windows[room] = {
+                d.windows[room.room] = {
                     header : header,
                     container : container,
                     pos : el.find('.' + d.config.headerClass).length
