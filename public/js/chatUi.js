@@ -1,7 +1,7 @@
 "use strict";
 (function (K, $) {
     var methods = {
-        init: function (uconfig, callback) {
+        init: function (callback) {
             callback = callback || $.noop;
             var self = this;
             this.data('kwarqueChat', {
@@ -17,19 +17,14 @@
                     publicClass: 'public',
                     statusClass: 'status',
                     containerClass: 'container'
-                }, uconfig)
+                })
             });
             var d = this.data('kwarqueChat');
+            methods.openWindow.call(self, {
+                title : 'status',
+                room : '~'
+            }, callback());
 
-            K.chat.authenticate(d.config.nick, d.config.password, function (response) {
-                d.activeRoom = response.room;
-                self.data('kwarqueChat', d);
-                response.title = 'status';
-                methods.openWindow.call(self, response, function () {
-                    methods.message.call(self, response);
-                    callback();
-                });
-            });
             K.chat.on('message', $.proxy(methods.message, self));
             
             K.chat.on('clientJoined', function(msg) {
@@ -58,6 +53,19 @@
             });
             return this;
         },
+
+        authenticate : function(nick, password, callback) {
+            var self = this;
+            K.chat.authenticate(nick, password, function (response) {
+                methods.message.call(self, {
+                    room : '~',
+                    nick : 'sixth sense',
+                    msg  : 'authentication ' + (response === 'error' ? 'failed' : 'succeeded')
+                });
+                callback(response);
+            });  
+        },
+        
         message: function(msg) {
             var d = this.data('kwarqueChat');
             if (msg.room in d.windows) {
@@ -77,7 +85,7 @@
             d.windows[room].header.remove();
             d.windows[room].container.remove();
             delete d.windows[room];
-            if (room === d.activeRoom) d.activeRoom = '~' + d.config.nick;
+            if (room === d.activeRoom) d.activeRoom = '~';
             methods.createAccordion.apply(this);
             K.chat.leave(room, callback);
             this.data('kwarqueChat', d);
@@ -149,7 +157,7 @@
                     header.addClass(d.config[cls + 'Class']);
                     container.addClass(d.config[cls + 'Class']);
                 }
-                if (room.room === '~' + d.nick) {
+                if (room.room === '~') {
                     // status
                     addClasses("status");
                 } else if (room.room.match(/~/)) {

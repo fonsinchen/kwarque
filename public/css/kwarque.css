@@ -44,7 +44,6 @@ div div.status div.messages, div div.public div.messages, div div.private div.me
     left: 0.5%;
 }
 .kwarque-chat-input {
-    display: none;
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -92,11 +91,11 @@ div div.messages {
 #nick-space input {
     margin-top: 1%;
 }
-#set-nick {
+#login {
     margin-left: 40%;
     width: 17%;
 }
-#nickname, #room {
+#nick, #password {
     width: 80%;
 }
 

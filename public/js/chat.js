@@ -1,7 +1,7 @@
 "use strict";
 (function (K, io) {
     var socket = io.connect();
-    var nick = null;
+    var nick = (Math.random() + '').substring(2);
     var rooms = [];
     var roomCallbacks = {};
     var globalCallbacks = {};
@@ -39,12 +39,12 @@
     };
 
     K.chat.authenticate = function (newNick, password, callback) {
-        nick = newNick;
         socket.emit('authenticate', {
-            nick : nick,
+            nick : newNick,
             password : password,
             room : null
         }, function (response) {
+            if (response !== 'error') nick = newNick;
             callback(response);
         });
     };

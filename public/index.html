@@ -20,16 +20,12 @@
                 $(document).ready(function() {
                     $("#map").kwarqueMap();
                     $('#map').kwarqueMap('connect');
+                    $('.kwarque-chat').kwarqueChat();
                     $("#nick-space").submit(function (e) {
                         e.preventDefault();
-                        var nick = $("#nickname").val();
-                        $("#nick-space").remove();
-                        $("#chat-input").show();
-                        $('.kwarque-chat').kwarqueChat({
-                            nick : nick,
-                            password : ''
-                        }, function() {
-                            //$('.kwarque-chat').kwarqueChat('openWindow', 'global');
+                        $('.kwarque-chat').kwarqueChat('authenticate',
+                                $("#nick").val(), $("#password").val(), function(result) {
+                            if (result !== 'error') $("#nick-space").remove();
                         });
                     });
                 });
@@ -41,14 +37,14 @@
         <div id="chat" class="kwarque-chat">
             <form id="nick-space" action="#">
                 <div>
-                    <input name="nickname" type="text" id="nickname"/>
-                    <label for="nickname">nick</label>
+                    <input name="nick" type="text" id="nick"/>
+                    <label for="nick">nick</label>
                 </div>
                 <div>
-                    <input name="room" type="text" id="room"/>
-                    <label for="room">room</label>
+                    <input name="password" type="password" id="password"/>
+                    <label for="password">password</label>
                 </div>
-                <input type="submit" id="set-nick" value="join"/>
+                <input type="submit" id="login" value="login"/>
             </form>
                     
             <form id="chat-input" class="kwarque-chat-input" action="#">
