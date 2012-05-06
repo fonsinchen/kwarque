@@ -131,7 +131,11 @@
             var d = this.data('kwarqueChat');
             d.windows[room].header.remove();
             d.windows[room].container.remove();
+            var pos = d.windows[room].pos;
             delete d.windows[room];
+            $.each(d.windows, function(i, win) {
+                if (win.pos > pos) --win.pos;
+            });
             if (room === d.activeRoom) d.activeRoom = '~';
             methods.createAccordion.apply(this);
             K.chat.leave(room, callback);
@@ -167,19 +171,19 @@
             callback = callback || $.noop;
             var d = this.data('kwarqueChat');
             var el = this;
-            if (typeof d.windows[room.room] !== 'undefined') {
+            if (typeof d.windows[room.room] === 'undefined') {
+                methods.createWindow.call(el, room, function(msg) {
+                    methods.message.call(el, msg);
+                    el.accordion("activate", d.windows[room.room].pos);
+                    callback();
+                });
+            } else if (d.windows[room.room] !== null) { // if null, user has clicked twice
                 var changeCallback = function() {
                     el.unbind("accordionchange", changeCallback);
                     callback();
                 };
                 el.bind("accordionchange", changeCallback);
                 el.accordion("activate", d.windows[room.room].pos);
-            } else {
-                methods.createWindow.call(el, room, function(msg) {
-                    methods.message.call(el, msg);
-                    el.accordion("activate", d.windows[room.room].pos);
-                    callback();
-                });
             }
             return this;
         },
@@ -187,6 +191,7 @@
             callback = callback || $.noop;
             var el = this;
             var d = this.data('kwarqueChat');
+            d.windows[room.room] = null;
             K.chat.join(room.room, function(response) {
                 var toggler = K.dce("a").addClass(d.config.togglerClass).text(room.title);
                 var container = K.dce("div").addClass(d.config.containerClass);
