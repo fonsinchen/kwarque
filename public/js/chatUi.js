@@ -23,7 +23,31 @@
             methods.openWindow.call(self, {
                 title : 'status',
                 room : '~'
-            }, callback());
+            }, function() {
+                var container = d.windows['~'].container;
+                container.append($('#nick-space').remove());
+                container.scrollTop(container.prop('scrollHeight') - container.innerHeight());
+                $("#nick-space").submit(function (e) {
+                    e.preventDefault();
+                    var callback = function(result) {
+                        if (result !== 'error') $("#nick-space").remove();
+                    };
+                    if ($('#login').val() === 'login') {
+                        methods.login.call(self, $("#nick").val(),
+                                $("#password").val(), callback);
+                    } else {
+                        methods.register.call(self, $("#nick").val(),
+                                $("#password").val(),
+                                $("#password-repeat").val(), callback);
+                    }
+                });
+                $('#register').click(function () {
+                    $(this).remove();
+                    $('#password-repeat-space').show();
+                    $('#login').val("register");
+                });
+                callback();
+            });
 
             K.chat.on('message', $.proxy(methods.message, self));
 
@@ -40,7 +64,7 @@
                 })]);
             });
             methods.createAccordion.apply(this);
-            $(this).find('.kwarque-chat-input').submit(function (e) {
+            $('.kwarque-chat-input').submit(function (e) {
                 e.preventDefault();
                 var messageNode = $(this).find('.kwarque-chat-message');
                 var m = messageNode.val();
@@ -120,7 +144,7 @@
                 active: d.activeRoom ? d.windows[d.activeRoom].pos: 0,
                 change: methods.change,
                 header: 'div.' + d.config.headerClass,
-                autoHeight: false
+                fillSpace: true
             });
             return this;
         },

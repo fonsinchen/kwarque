@@ -21,54 +21,16 @@
                     $("#map").kwarqueMap();
                     $('#map').kwarqueMap('connect');
                     $('.kwarque-chat').kwarqueChat();
-                    $("#nick-space").submit(function (e) {
-                        e.preventDefault();
-                        var callback = function(result) {
-                            if (result !== 'error') $("#nick-space").remove();
-                        };
-                        if ($('#login').val() === 'login') {
-                            $('.kwarque-chat').kwarqueChat('login',
-                                    $("#nick").val(), $("#password").val(),
-                                    callback);
-                        } else {
-                            $('.kwarque-chat').kwarqueChat('register', 
-                                    $("#nick").val(), $("#password").val(),
-                                    $("#password-repeat").val(), callback);
-                        }
-                    });
-                    $('#register').click(function () {
-                        $(this).hide();
-                        $('#password-repeat-space').show();
-                        $('#login').val("register");
-                    });
                 });
             })(jQuery);
         </script>
     </head>
 
     <body>
-        <div id="chat" class="kwarque-chat">
-            <form id="nick-space" action="#">
-                <table>
-                    <tr>
-                        <td><label for="nick">nick</label></td>
-                        <td><input name="nick" type="text" id="nick"/></td>
-                    </tr>    
-                    <tr>
-                        <td><label for="password">password</label></td>
-                        <td><input name="password" type="password" id="password"/></td>
-                    </tr>
-                    <tr id="password-repeat-space">
-                        <td><label for="password-repeat">repeat</label></td>
-                        <td><input name="password-repeat" type="password" id="password-repeat"/></td>
-                    </tr>
-                </table>
-                <div id="button-space">
-                    <input type="submit" id="login" value="login"/>
-                    <input type="button" id="register" value="register"/>
-                </div>
-            </form>
-                    
+        <div id="chat">
+            <div id="chat-container">
+                <div class="kwarque-chat"></div>
+            </div>
             <form id="chat-input" class="kwarque-chat-input" action="#">
                 <input type="submit" value="kwrq" tabindex="2" class="kwarque-chat-submit">
                 <input name="text" value="" size="50" class="kwarque-chat-message" autocomplete="off">
@@ -91,7 +53,26 @@
             <button class="kwarque-map-add">+</button>
         </div>
         <div id="templates">
-            
+            <form id="nick-space" action="#">
+                <table>
+                    <tr>
+                        <td><label for="nick">nick</label></td>
+                        <td><input name="nick" type="text" id="nick"/></td>
+                    </tr>    
+                    <tr>
+                        <td><label for="password">password</label></td>
+                        <td><input name="password" type="password" id="password"/></td>
+                    </tr>
+                    <tr id="password-repeat-space">
+                        <td><label for="password-repeat">repeat</label></td>
+                        <td><input name="password-repeat" type="password" id="password-repeat"/></td>
+                    </tr>
+                </table>
+                <div id="button-space">
+                    <input type="submit" id="login" value="login"/>
+                    <input type="button" id="register" value="register"/>
+                </div>
+            </form>
         </div>
     </body>
 </html>
