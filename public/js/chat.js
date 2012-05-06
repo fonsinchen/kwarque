@@ -5,6 +5,18 @@
     var rooms = [];
     var roomCallbacks = {};
     var globalCallbacks = {};
+    
+    var authenticate = function(mode, newNick, password, callback) {
+        socket.emit(mode, {
+            nick : newNick,
+            password : password,
+            room : null
+        }, function (response) {
+            if (response !== 'error') nick = newNick;
+            callback(response);
+        });
+    };
+    
     K.chat = {};
 
     K.chat.emit = function(event, data, callback) {
@@ -38,15 +50,12 @@
         }
     };
 
-    K.chat.authenticate = function (newNick, password, callback) {
-        socket.emit('authenticate', {
-            nick : newNick,
-            password : password,
-            room : null
-        }, function (response) {
-            if (response !== 'error') nick = newNick;
-            callback(response);
-        });
+    K.chat.login = function (newNick, password, callback) {
+        authenticate('login', newNick, password, callback);
+    };
+
+    K.chat.register = function (newNick, password, callback) {
+        authenticate('register', newNick, password, callback);
     };
 
     K.chat.join = function (room, callback) {

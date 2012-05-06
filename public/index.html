@@ -23,10 +23,23 @@
                     $('.kwarque-chat').kwarqueChat();
                     $("#nick-space").submit(function (e) {
                         e.preventDefault();
-                        $('.kwarque-chat').kwarqueChat('authenticate',
-                                $("#nick").val(), $("#password").val(), function(result) {
+                        var callback = function(result) {
                             if (result !== 'error') $("#nick-space").remove();
-                        });
+                        };
+                        if ($('#login').val() === 'login') {
+                            $('.kwarque-chat').kwarqueChat('login',
+                                    $("#nick").val(), $("#password").val(),
+                                    callback);
+                        } else {
+                            $('.kwarque-chat').kwarqueChat('register', 
+                                    $("#nick").val(), $("#password").val(),
+                                    $("#password-repeat").val(), callback);
+                        }
+                    });
+                    $('#register').click(function () {
+                        $(this).hide();
+                        $('#password-repeat-space').show();
+                        $('#login').val("register");
                     });
                 });
             })(jQuery);
@@ -37,14 +50,19 @@
         <div id="chat" class="kwarque-chat">
             <form id="nick-space" action="#">
                 <div>
-                    <input name="nick" type="text" id="nick"/>
+                    <input name="nick" type="text" class="login-field" id="nick"/>
                     <label for="nick">nick</label>
                 </div>
                 <div>
-                    <input name="password" type="password" id="password"/>
+                    <input name="password" type="password" class="login-field" id="password"/>
                     <label for="password">password</label>
                 </div>
+                <div id="password-repeat-space">
+                    <input name="password-repeat" type="password" class="login-field" id="password-repeat"/>
+                    <label for="password-repeat">repeat</label>
+                </div>
                 <input type="submit" id="login" value="login"/>
+                <input type="button" id="register" value="register"/>
             </form>
                     
             <form id="chat-input" class="kwarque-chat-input" action="#">

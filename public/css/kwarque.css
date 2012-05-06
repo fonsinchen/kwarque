@@ -84,18 +84,24 @@ div div.messages {
     padding: 1%;
 }
 #nick-space label {
-    min-width: 17%;
+    width: 17%;
     float: left;
     margin-top: 1%;
 }
 #nick-space input {
     margin-top: 1%;
 }
+
 #login {
     margin-left: 40%;
     width: 17%;
 }
-#nick, #password {
+
+#password-repeat-space {
+    display:none;
+}
+
+.login-field {
     width: 80%;
 }
 

@@ -26,7 +26,7 @@
             }, callback());
 
             K.chat.on('message', $.proxy(methods.message, self));
-            
+
             K.chat.on('clientJoined', function(msg) {
                 methods.message.apply(self, [$.extend(msg, {
                     msg : msg.nick + ' has joined',
@@ -54,18 +54,41 @@
             return this;
         },
 
-        authenticate : function(nick, password, callback) {
+        login : function(nick, password, callback) {
             var self = this;
-            K.chat.authenticate(nick, password, function (response) {
+            K.chat.login(nick, password, function (response) {
                 methods.message.call(self, {
                     room : '~',
                     nick : 'sixth sense',
                     msg  : 'authentication ' + (response === 'error' ? 'failed' : 'succeeded')
                 });
                 callback(response);
-            });  
+            });
         },
-        
+
+        register : function(nick, password, passwordRepeat, callback) {
+            var self = this;
+            if (password !== passwordRepeat) {
+                methods.message.call(self, {
+                    room : '~',
+                    nick : 'sixth sense',
+                    msg  : "passwords don't match"
+                });
+                callback('error');
+            } else {
+                K.chat.register(nick, password, function (response) {
+                    methods.message.call(self, {
+                        room : '~',
+                        nick : 'sixth sense',
+                        msg  : 'registration ' + (response === 'error' ? 
+                            'failed, nick "' + nick + '" already exists' :
+                            'succeeded, hello ' + nick)
+                    });
+                    callback(response);
+                });
+            }
+        },
+
         message: function(msg) {
             var d = this.data('kwarqueChat');
             if (msg.room in d.windows) {
@@ -145,7 +168,7 @@
                 var container = K.dce("div").addClass(d.config.containerClass);
                 var header = K.dce("div").addClass(d.config.headerClass);
                 var infoIcon = K.dce("span").addClass(d.config.infoIconClass);
-                
+
                 var closeIcon = K.dce("span").addClass(d.config.closeIconClass);
                 closeIcon.click(function() {
                     methods.removeWindow.call(el, room.room);
