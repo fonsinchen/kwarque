@@ -82,27 +82,23 @@ div div.messages {
 }
 #nick-space {
     padding: 1%;
-}
-#nick-space label {
-    width: 17%;
-    float: left;
-    margin-top: 1%;
-}
-#nick-space input {
-    margin-top: 1%;
+    border: 1px solid #880000;
 }
 
-#login {
-    margin-left: 40%;
-    width: 17%;
+#nick-space table {
+    width: 100%;
+}
+
+#nick, #password, #password-repeat {
+    width: 100%;
 }
 
 #password-repeat-space {
     display:none;
 }
 
-.login-field {
-    width: 80%;
+#button-space {
+    text-align:right;
 }
 
 button.kwarque-map-add {

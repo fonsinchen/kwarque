@@ -49,20 +49,24 @@
     <body>
         <div id="chat" class="kwarque-chat">
             <form id="nick-space" action="#">
-                <div>
-                    <input name="nick" type="text" class="login-field" id="nick"/>
-                    <label for="nick">nick</label>
+                <table>
+                    <tr>
+                        <td><label for="nick">nick</label></td>
+                        <td><input name="nick" type="text" id="nick"/></td>
+                    </tr>    
+                    <tr>
+                        <td><label for="password">password</label></td>
+                        <td><input name="password" type="password" id="password"/></td>
+                    </tr>
+                    <tr id="password-repeat-space">
+                        <td><label for="password-repeat">repeat</label></td>
+                        <td><input name="password-repeat" type="password" id="password-repeat"/></td>
+                    </tr>
+                </table>
+                <div id="button-space">
+                    <input type="submit" id="login" value="login"/>
+                    <input type="button" id="register" value="register"/>
                 </div>
-                <div>
-                    <input name="password" type="password" class="login-field" id="password"/>
-                    <label for="password">password</label>
-                </div>
-                <div id="password-repeat-space">
-                    <input name="password-repeat" type="password" class="login-field" id="password-repeat"/>
-                    <label for="password-repeat">repeat</label>
-                </div>
-                <input type="submit" id="login" value="login"/>
-                <input type="button" id="register" value="register"/>
             </form>
                     
             <form id="chat-input" class="kwarque-chat-input" action="#">
