@@ -33,6 +33,11 @@ body {
     height: 95%;
 }
 
+.kwarque-chat .container p {
+    margin-top:0;
+    margin-bottom:0;
+}
+
 #map {
     width:69.5%;
     left: 0.5%;

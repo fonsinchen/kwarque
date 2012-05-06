@@ -172,8 +172,7 @@
             var d = this.data('kwarqueChat');
             var el = this;
             if (typeof d.windows[room.room] === 'undefined') {
-                methods.createWindow.call(el, room, function(msg) {
-                    methods.message.call(el, msg);
+                methods.createWindow.call(el, room, function() {
                     el.accordion("activate", d.windows[room.room].pos);
                     callback();
                 });
