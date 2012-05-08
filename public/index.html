@@ -21,6 +21,7 @@
                     $("#map").kwarqueMap();
                     $('#map').kwarqueMap('connect');
                     $('.kwarque-chat').kwarqueChat();
+                    $('.imprint-mail').text('j' + '@' + 'kwrq' + '.' + 'net');
                 });
             })(jQuery);
         </script>
@@ -71,6 +72,10 @@
                 <div id="button-space">
                     <input type="submit" id="login" value="login"/>
                     <input type="button" id="register" value="register"/>
+                </div>
+                <div class="imprint">
+                    Impressum: Ulf Hermann, Weserstr. 191,
+                    12045 Berlin, <span class="imprint-mail"></span>
                 </div>
             </form>
         </div>

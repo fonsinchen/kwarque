@@ -123,3 +123,9 @@ div.header span.closeIcon {
     background-repeat: no-repeat;
     overflow:hidden;
 }
+
+.imprint {
+    padding-top:12pt;
+    text-align:right;
+    font-size:8pt;
+}
