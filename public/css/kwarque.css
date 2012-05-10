@@ -130,8 +130,13 @@ div.header span.closeIcon {
     overflow:hidden;
 }
 
-.imprint {
+.license {
     padding-top:12pt;
-    text-align:right;
+    font-size:10pt;
+}
+
+.imprint {
+    margin-top:12pt;
     font-size:8pt;
+    border-top:1px dotted white;
 }
