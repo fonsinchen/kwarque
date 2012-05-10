@@ -12,7 +12,14 @@
         y : -20037508.34,
         w : 20037508.34 * 2,
         h : 20037508.34 * 2
-    }
+    };
+    
+    var openDialog = function(dialog, w, h) {
+        dialog.dialog('open');
+        dialog.dialog('option', 'width',  w * 0.8);
+        dialog.dialog('option', 'height', h * 0.8);
+        dialog.dialog('option', 'position', [w * 0.1, h * 0.1]);    
+    };
 
     var methods = {
         init : function() {
@@ -58,10 +65,7 @@
                     var lonlat = map.getLonLatFromViewPortPx(evt.xy);
                     input.find('.kwarque-map-input-lon').val(lonlat.lon);
                     input.find('.kwarque-map-input-lat').val(lonlat.lat);
-                    input.dialog('open');
-                    input.dialog('option', 'width',  element.width() * 0.8);
-                    input.dialog('option', 'height', element.height() * 0.8);
-                    input.dialog('option', 'position', [element.width() * 0.1, element.height() * 0.1]);
+                    openDialog(input, element.width(), element.height());
                     clickHandler.deactivate();
                 }
             });
@@ -122,10 +126,11 @@
             var marker = new OpenLayers.Marker(lonLat);
             marker.feature = feature;
 
+            var element = $(this);
             var markerClick = function(evt) {
                 data.dialog.dialog('option', 'title', this.data.title);
                 data.dialog.find('.kwarque-map-popup-text').text(this.data.text);
-                data.dialog.dialog('open');
+                openDialog(data.dialog, element.width(), element.height());
                 K.emit('fragmentOpened', this.data);
                 OpenLayers.Event.stop(evt);
             };
