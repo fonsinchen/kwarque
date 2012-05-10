@@ -29,7 +29,8 @@
             var d = this.data('kwarqueChat');
             methods.openWindow.call(self, {
                 title : 'status',
-                room : '~'
+                room : '~',
+                sticky : true
             }, function() {
                 var container = d.windows['~'].container;
                 container.append($('#nick-space').remove());
@@ -203,14 +204,17 @@
                 var container = K.dce("div").addClass(d.config.containerClass);
                 var header = K.dce("div").addClass(d.config.headerClass);
                 var infoIcon = K.dce("span").addClass(d.config.infoIconClass);
-
-                var closeIcon = K.dce("span").addClass(d.config.closeIconClass);
-                closeIcon.click(function() {
-                    methods.removeWindow.call(el, room.room);
-                });
                 header.append(toggler);
                 header.append(infoIcon);
-                header.append(closeIcon);
+                
+                if (!room.sticky) {
+                    var closeIcon = K.dce("span").addClass(d.config.closeIconClass);
+                    closeIcon.click(function() {
+                        methods.removeWindow.call(el, room.room);
+                    });
+                    header.append(closeIcon);
+                }
+                
                 var addClasses = function (cls) {
                     header.addClass(d.config[cls + 'Class']);
                     container.addClass(d.config[cls + 'Class']);
