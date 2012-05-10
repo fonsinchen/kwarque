@@ -1,4 +1,11 @@
 "use strict";
+
+/*!
+ * This file is part of kwarque.
+ * Copyright(c) 2012 Ulf Hermann <ulf_hermann@gmx.net>
+ * Licensed under AGPL v3, see COPYING
+ */
+
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
         if (this == null) throw new TypeError();
