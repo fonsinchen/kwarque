@@ -38,7 +38,10 @@
                 $("#nick-space").submit(function (e) {
                     e.preventDefault();
                     var callback = function(result) {
-                        if (result !== 'error') $("#nick-space").remove();
+                        if (result !== 'error') {
+                            $("#nick-space").remove();
+                            K.emit('login');
+                        }
                     };
                     if ($('#login').val() === 'login') {
                         methods.login.call(self, $("#nick").val(),

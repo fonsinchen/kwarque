@@ -59,8 +59,12 @@
                     clickHandler.deactivate();
                 }
             });
-            $(this).find('.kwarque-map-add').button().click(function() {
+            var button = $(this).find('.kwarque-map-add');
+            button.button().click(function() {
                 clickHandler.activate();
+            });
+            K.on('login', function() {
+                button.show();
             });
             this.data('kwarqueMap', {
                 map : map,
