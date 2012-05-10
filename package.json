@@ -1,8 +1,0 @@
-{
-    "name": "kwarque"
-  , "version": "14"
-  , "private": true
-  , "dependencies": {
-      "express": "2.5.8"
-  }
-}
