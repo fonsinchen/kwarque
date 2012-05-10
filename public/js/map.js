@@ -51,10 +51,10 @@
  
             var markers = new OpenLayers.Layer.Markers( "Markers" );
             var element = $(this);
-            var dialog = $(this).find('.kwarque-map-popup').dialog({
+            var dialog = element.find('.kwarque-map-popup').dialog({
                 autoOpen : false
             });
-            var input = $(this).find('.kwarque-map-input').dialog({
+            var input = element.find('.kwarque-map-input').dialog({
                 title : "write new fragment",
                 autoOpen : false
             });
@@ -67,10 +67,12 @@
                     input.find('.kwarque-map-input-lat').val(lonlat.lat);
                     openDialog(input, element.width(), element.height());
                     clickHandler.deactivate();
+                    element.css('cursor', 'default');
                 }
             });
             var button = $(this).find('.kwarque-map-add');
             button.button().click(function() {
+                element.css('cursor', 'crosshair');
                 clickHandler.activate();
             });
             K.on('login', function() {
