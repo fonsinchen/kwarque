@@ -43,7 +43,10 @@
             var lonLat = new OpenLayers.LonLat(1495588,6888577);
  
             var markers = new OpenLayers.Layer.Markers( "Markers" );
-            var dialog = $(this).find('.kwarque-map-popup').dialog({autoOpen : false});
+            var element = $(this);
+            var dialog = $(this).find('.kwarque-map-popup').dialog({
+                autoOpen : false
+            });
             var input = $(this).find('.kwarque-map-input').dialog({
                 title : "write new fragment",
                 autoOpen : false
@@ -56,6 +59,9 @@
                     input.find('.kwarque-map-input-lon').val(lonlat.lon);
                     input.find('.kwarque-map-input-lat').val(lonlat.lat);
                     input.dialog('open');
+                    input.dialog('option', 'width',  element.width() * 0.8);
+                    input.dialog('option', 'height', element.height() * 0.8);
+                    input.dialog('option', 'position', [element.width() * 0.1, element.height() * 0.1]);
                     clickHandler.deactivate();
                 }
             });
