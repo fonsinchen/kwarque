@@ -32,14 +32,16 @@
                 eventListeners : {
                     moveend : function() {
                         var extent = map.getExtent();
-                        tree.prepare({
-                            x : extent.left,
-                            y : extent.bottom,
-                            w : extent.right - extent.left,
-                            h : extent.top - extent.bottom
-                        }, function(node) {
-                            K.chat.emit("watch", node, function(status) {
-                                if (status === 'error') console.log('db error, needs handling');
+                        K.chat.emit("ignore", null, function() {
+                            tree.prepare({
+                                x : extent.left,
+                                y : extent.bottom,
+                                w : extent.right - extent.left,
+                                h : extent.top - extent.bottom
+                            }, function(node) {
+                                K.chat.emit("watch", node, function(status) {
+                                    if (status === 'error') console.log('db error, needs handling');
+                                }); 
                             });
                         });
                     }
@@ -70,7 +72,7 @@
                     element.css('cursor', 'default');
                 }
             });
-            var button = $(this).find('.kwarque-map-add');
+            var button = element.find('.kwarque-map-add');
             button.button().click(function() {
                 element.css('cursor', 'crosshair');
                 clickHandler.activate();
