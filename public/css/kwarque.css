@@ -21,6 +21,13 @@ body, input, textarea {
     z-index: 2000;
 }
 
+.kwarque-map-popup-owner {
+    float: right;
+    border: 1px solid white;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
 svg, img, .olLayerDiv div, .olControlPanZoom div {
     background-color:transparent;
 }

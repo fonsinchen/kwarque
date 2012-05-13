@@ -134,6 +134,7 @@
             var markerClick = function(evt) {
                 data.dialog.dialog('option', 'title', this.data.title);
                 data.dialog.find('.kwarque-map-popup-text').text(this.data.text);
+                data.dialog.find('.kwarque-map-popup-owner').text(this.data.owner);
                 openDialog(data.dialog, element.width(), element.height());
                 K.emit('fragmentOpened', this.data);
                 OpenLayers.Event.stop(evt);
