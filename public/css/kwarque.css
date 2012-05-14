@@ -51,6 +51,14 @@ body {
     margin-bottom:0;
 }
 
+.container .members {
+    float:right;
+    width:40%;
+    border:1px solid white;
+    overflow:hidden;
+    adding-left:1%;
+}
+
 #map {
     width:69.5%;
     left: 0.5%;

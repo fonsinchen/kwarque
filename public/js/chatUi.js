@@ -23,7 +23,8 @@
                     privateClass: 'private',
                     publicClass: 'public',
                     statusClass: 'status',
-                    containerClass: 'container'
+                    containerClass: 'container',
+                    membersClass: 'members'
                 })
             });
             var d = this.data('kwarqueChat');
@@ -63,17 +64,37 @@
             K.chat.on('message', $.proxy(methods.message, self));
 
             K.chat.on('clientJoined', function(msg) {
-                methods.message.apply(self, [$.extend(msg, {
+                methods.message.apply(self, [$.extend({}, msg, {
                     msg : msg.nick + ' has joined',
                     nick : 'sixth sense'
                 })]);
+                var d = self.data('kwarqueChat');
+                if (msg.room in d.windows) {
+                    var members = d.windows[msg.room].container.find('.members');
+                    members.append(K.dce('p').text(msg.nick));
+                }
             });
+
             K.chat.on('clientLeft', function(msg) {
-                methods.message.apply(self, [$.extend(msg, {
+                methods.message.apply(self, [$.extend({}, msg, {
                     msg : msg.nick + ' has left',
                     nick : 'sixth sense'
                 })]);
+                var d = self.data('kwarqueChat');
+                if (msg.room in d.windows) {
+                    var members = d.windows[msg.room].container.find('.members').children();
+                    members.each(function(i, member) {
+                        member = $(member);
+                        if (member.text() === msg.nick) {
+                            member.remove();
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    });
+                }
             });
+
             methods.createAccordion.apply(this);
             $('.kwarque-chat-input').submit(function (e) {
                 e.preventDefault();
@@ -205,6 +226,11 @@
             K.chat.join(room.room, function(response) {
                 var toggler = K.dce("a").addClass(d.config.togglerClass).text(room.title);
                 var container = K.dce("div").addClass(d.config.containerClass);
+                var members = K.dce("div").addClass(d.config.membersClass);
+                $.each(response, function(i, member) {
+                    members.append(K.dce('p').text(member));
+                });
+                container.append(members);
                 var header = K.dce("div").addClass(d.config.headerClass);
                 var infoIcon = K.dce("span").addClass(d.config.infoIconClass);
                 header.append(toggler);
