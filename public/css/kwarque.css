@@ -56,7 +56,7 @@ body {
     width:40%;
     border:1px solid white;
     overflow:hidden;
-    adding-left:1%;
+    padding-left:1%;
 }
 
 #map {

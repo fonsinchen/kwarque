@@ -226,11 +226,13 @@
             K.chat.join(room.room, function(response) {
                 var toggler = K.dce("a").addClass(d.config.togglerClass).text(room.title);
                 var container = K.dce("div").addClass(d.config.containerClass);
-                var members = K.dce("div").addClass(d.config.membersClass);
-                $.each(response, function(i, member) {
-                    members.append(K.dce('p').text(member));
-                });
-                container.append(members);
+                if (room.room !== '~') {
+                    var members = K.dce("div").addClass(d.config.membersClass);
+                    $.each(response, function(i, member) {
+                        members.append(K.dce('p').text(member));
+                    });
+                    container.append(members);
+                }
                 var header = K.dce("div").addClass(d.config.headerClass);
                 var infoIcon = K.dce("span").addClass(d.config.infoIconClass);
                 header.append(toggler);
