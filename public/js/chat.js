@@ -97,5 +97,7 @@
             callback(response);
         });
     };
+    
+    K.chat.getNick = function () {return nick;};
 })(KWARQUE, io);
 

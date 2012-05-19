@@ -7,12 +7,13 @@
  */
 
 (function (K, $) {
-    var dimensions = {
+    var tree = K.quadtree.init({
         x : -20037508.34,
         y : -20037508.34,
         w : 20037508.34 * 2,
-        h : 20037508.34 * 2
-    };
+        h : 20037508.34 * 2,
+        node : K.quadtree.frontendNode
+    });
     
     var openDialog = function(dialog, w, h) {
         dialog.dialog('open');
@@ -23,10 +24,6 @@
 
     var methods = {
         init : function() {
-            var treeparams = K.create(dimensions);
-            treeparams.maxDepth = 16;
-            treeparams.maxChildren = 128;
-            var tree = K.quadtree.init(treeparams)
             var map = new OpenLayers.Map({
                 div : this[0],
                 eventListeners : {
@@ -38,8 +35,12 @@
                                 y : extent.bottom,
                                 w : extent.right - extent.left,
                                 h : extent.top - extent.bottom
-                            }, function(node) {
-                                K.chat.emit("watch", node, function(status) {
+                            }, function(depth, position, timestamp) {
+                                K.chat.emit("watch", {
+                                    depth : depth,
+                                    position : position,
+                                    timestamp : timestamp
+                                }, function(status) {
                                     if (status === 'error') console.log('db error, needs handling');
                                 }); 
                             });
@@ -91,8 +92,11 @@
         
         connect : function() {
             var self = this;
-            K.chat.on("fragment", function(row) {
-                self.kwarqueMap('addMarker', row);
+            K.chat.on("fragment", function(item) {
+                item.h = item.h || 0;
+                item.w = item.w || 0;
+                tree.update(item);
+                self.kwarqueMap('addMarker', item);
             });
             var data = this.data("kwarqueMap");
             
@@ -109,6 +113,7 @@
                 K.chat.emit("insert", content, function(result, id) {
                     if (result === 'end') {
                         content.id = id;
+                        content.owner = K.chat.getNick();
                         self.kwarqueMap('addMarker', content);
                         el.find('.kwarque-map-input-title, .kwarque-map-input-text').val('');
                         data.input.dialog('close');

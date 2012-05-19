@@ -30,15 +30,18 @@ if (!Array.prototype.indexOf) {
     }
 }
 
-var KWARQUE = {};
-
-(function (K, $) {
-    K.create = function (obj) {
+if (typeof Object.create !== 'function') {
+    Object.create = function (obj) {
         var F = function() {};
         F.prototype = obj;
         return new F();
     };
+}
 
+
+var KWARQUE = {};
+
+(function (K, $) {
     K.dce = function (name) {
         return $(document.createElement(name));
     };
