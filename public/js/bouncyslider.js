@@ -8,7 +8,7 @@
         var slider = K.dce('div').appendTo(this);
         var labels = K.dce('div').addClass("ui-slider ui-slider-horizontal ui-slider-labels").appendTo(this);
         var widthTest = K.dce('span').height(0).text('8888/88/88').appendTo(labels);
-        var cutoff = widthTest.width() * 100 / labels.width();
+        var cutoff = widthTest.width();
         widthTest.remove();
         
         var leftLabels = range().css('text-align', 'right').appendTo(labels);
@@ -46,10 +46,11 @@
         var adjustLabels = function(event, ui) {
             var left = Math.round((ui.values[0] - min) * 100 / (max - min));
             var right = Math.round((ui.values[1] - min) * 100 / (max - min));
-            if ((right - left) > cutoff) {
+            var cutoffPercentage = cutoff * 100 / labels.width()
+            if ((right - left) > cutoffPercentage) {
                 leftLabels.css('right', 100 - left + '%');
-                centerLabels.css('left', (right + left - cutoff) / 2 + '%');
-                centerLabels.css('width', cutoff + '%');
+                centerLabels.css('left', (right + left - cutoffPercentage) / 2 + '%');
+                centerLabels.css('width', cutoff + 'px');
                 rightLabels.css('left', right + '%');
             }
             var interval = calcInterval(ui);
