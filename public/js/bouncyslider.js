@@ -1,19 +1,18 @@
 // Example: $('#slider-range').bouncyslider(-1000000000, 1000000000);
 
 (function(K, $) {
-    $.fn.bouncyslider = function(min, max) {
-        var lower, upper;
+    $.fn.bouncyslider = function(min, max, lower, upper) {
+        
         var range = function() {return K.dce('div').addClass("ui-slider-range");};
         var slider = K.dce('div').appendTo(this);
         var labels = K.dce('div').addClass("ui-slider ui-slider-horizontal").appendTo(this);
-        var leftLabels = range().text(min).appendTo(labels);
-        var centerLabels = range().appendTo(labels);
-        var rightLabels = range().text(max).css("text-align", "right").appendTo(labels);
-        var innerLabel = function() {
-            return K.dce('span').css('position', 'absolute');
-        }
-        var lowerLabel = innerLabel().css('left', 0).appendTo(centerLabels);
-        var upperLabel = innerLabel().css('right', 0).appendTo(centerLabels);
+        var widthTest = K.dce('span').height(0).text('8888/88/88').appendTo(labels);
+        var cutoff = widthTest.width();
+        widthTest.remove();
+        
+        var leftLabels = range().css('text-align', 'right').appendTo(labels);
+        var centerLabels = range().css('text-align', 'center').appendTo(labels);
+        var rightLabels = range().css('text-align', 'left').appendTo(labels);
 
         var calcInterval = function(ui) {
             var transpose = function(range, diff) {
@@ -45,18 +44,61 @@
         var adjustLabels = function(event, ui) {
             var left = Math.round((ui.values[0] - min) * 100 / (max - min));
             var right = Math.round((ui.values[1] - min) * 100 / (max - min));
-            leftLabels.css('width', left + '%');
-            centerLabels.css({
-                left : left + '%',
-                width : (right - left) + '%'
-            });
-            rightLabels.css({
-                left : right + '%',
-                width : (100 - right) + '%'
-            });
+            if ((right - left) * labels.width() / 100 > cutoff) {
+                leftLabels.css('width', left + '%');
+                centerLabels.css({
+                    left : left + '%',
+                    width : (right - left) + '%'
+                });
+                rightLabels.css({
+                    left : right + '%',
+                    width : (100 - right) + '%'
+                });
+            }
             var interval = calcInterval(ui);
-            lowerLabel.text(Math.round(interval[0]));
-            upperLabel.text(Math.round(interval[1]));
+            var startDate = new Date(interval[0]);
+            var endDate = new Date(interval[1]);
+            var common = '';
+            var start = '';
+            var end = '';
+            var nullpad = function(number) {
+                return (number < 10 ? '0' : '') + number;
+            }
+            var month = function(date) {
+                return nullpad(date.getMonth() + 1);
+            }
+            var day = function(date) {
+                return nullpad(date.getDate());
+            }
+            var time = function(date) {
+                return nullpad(date.getHours()) + ':' + nullpad(date.getMinutes());
+            }
+            if (startDate.getFullYear() === endDate.getFullYear()) {
+                common += startDate.getFullYear();
+                if (startDate.getMonth() === endDate.getMonth()) {
+                    common += '/' + month(startDate);
+                    if (startDate.getDate() === endDate.getDate()) {
+                        common += '/' + day(startDate);
+                    } else {
+                        start = day(startDate);
+                        end = day(endDate);
+                    }
+                } else {
+                    start = month(startDate) + '/' + day(startDate);
+                    end = month(endDate) + '/' + day(endDate);
+                }
+            } else {
+                start = startDate.getFullYear() + '/' + month(startDate) + '/' + day(startDate);
+                end = endDate.getFullYear() + '/' + month(endDate) + '/' + day(endDate);
+            }
+            if (interval[1] - interval[0] < 7 * 86400000) {
+                start += ' ' + time(startDate);
+                end += ' ' + time(endDate);
+            }
+
+            leftLabels.text(start);
+            rightLabels.text(end);
+            centerLabels.text(common);
         };
         
         slider.slider({
@@ -68,15 +110,16 @@
                 var interval = calcInterval(ui);
                 lower = interval[0];
                 upper = interval[1];
-                $( "#amount" ).val(lower + " - " + upper);
                 slider.slider('values', 0, (2 * min + max) / 3);
                 slider.slider('values', 1, (min + 2 * max) / 3);
             },
             change : adjustLabels,
             slide: adjustLabels
         });
-        lower = slider.slider('values', 0);
-        upper = slider.slider('values', 1);
-        adjustLabels(null, {values : [lower, upper]});
+        var onethird = slider.slider('values', 0);
+        var twothird = slider.slider('values', 1);
+        if (lower === undefined) lower = onethird;
+        if (upper === undefined) upper = twothird;
+        adjustLabels(null, {values : [onethird, twothird]});
     }
 })(KWARQUE, jQuery);
