@@ -1,8 +1,9 @@
 // Example: $('#slider-range').bouncyslider(-1000000000, 1000000000);
 
 (function(K, $) {
-    $.fn.bouncyslider = function(min, max, lower, upper) {
-        
+    $.fn.bouncyslider = function(min, max, lower, upper, exponent, innerExponent) {
+        if (exponent === undefined) exponent = 1;
+        if (innerExponent === undefined) innerExponent = 1;
         var range = function() {return K.dce('div').addClass("ui-slider-range");};
         var slider = K.dce('div').appendTo(this);
         var labels = K.dce('div').addClass("ui-slider ui-slider-horizontal ui-slider-labels").appendTo(this);
@@ -15,25 +16,26 @@
         var rightLabels = range().css('text-align', 'left').appendTo(labels);
 
         var calcInterval = function(ui) {
-            var transpose = function(range, diff) {
-                diff = diff * 3 / (max - min)
-                return (diff < 0 ? -1 : 1) * diff * diff * range;
+            var transpose = function(range, diff, exponent) {
+                diff = diff * 3 / (max - min);
+                var sign = (diff < 0 ? -1 : 1);
+                return sign * range * Math.pow(diff * sign, exponent);
             };
             var curLower = lower, curUpper = upper;
             if (ui.value === ui.values[0]) {
                 var diffLower = ui.value - (2 * min + max) / 3;
                 if (diffLower < 0) {
-                    curLower += transpose(lower - min, diffLower);
+                    curLower += transpose(lower - min, diffLower, exponent);
                 } else if (diffLower > 0) {
-                    curLower += transpose(upper - lower, diffLower);
+                    curLower += transpose(upper - lower, diffLower, innerExponent);
                 }
             }
             if (ui.value === ui.values[1]) {
                 var diffUpper = (min + 2 * max) / 3 - ui.value;
                 if (diffUpper < 0) {
-                    curUpper -= transpose(max - upper, diffUpper);
+                    curUpper -= transpose(max - upper, diffUpper, exponent);
                 } else if (diffUpper > 0) {
-                    curUpper -= transpose(upper - lower, diffUpper);
+                    curUpper -= transpose(upper - lower, diffUpper, innerExponent);
                 }
             }
             curLower = Math.max(min, curLower);
@@ -85,8 +87,17 @@
                 }
             } else {
                 centerLabels.hide();
-                start = startDate.getFullYear() + '/' + month(startDate) + '/' + day(startDate);
-                end = endDate.getFullYear() + '/' + month(endDate) + '/' + day(endDate);
+                start = startDate.getFullYear();
+                end = endDate.getFullYear();
+                var yeardiff = end - start;
+                if (yeardiff < 10) {
+                    start += '/' + month(startDate);
+                    end += '/' + month(endDate);
+                    if (yeardiff < 3) {
+                        start += '/' + day(startDate);
+                        end += '/' + day(endDate);
+                    }
+                }
             }
             if (interval[1] - interval[0] < 7 * 86400000) {
                 start += ' ' + time(startDate);
