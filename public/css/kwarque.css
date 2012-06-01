@@ -13,6 +13,24 @@ body, input, textarea {
     display:none;
 }
 
+.kwarque-map-timeslider .ui-slider-labels {
+    margin-top: 5px;
+}
+
+.kwarque-map-timeslider .ui-slider-labels div {
+    background-color:black;
+    border:1px solid #880000;
+}
+
+.kwarque-map-timeslider {
+    width : 98%;
+    z-index : 1000;
+    font-weight:bold;
+    left: 1%;
+    bottom: 1%;
+    position:absolute;
+}
+
 .kwarque-map-popup {
     position: absolute;
     top: 1%;
