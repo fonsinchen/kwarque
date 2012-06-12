@@ -36,8 +36,8 @@
                         createLabels : K.date.labels,
                         min : -400000000000000,
                         max : 400000000000000,
-                        lower : now - 86399000,
-                        upper : now + 86399000,
+                        lower : now - 86399000 * 3,
+                        upper : now + 86399000 * 3,
                         exponent : 7,
                         innerExponent : 2,
                         stop : function(event, ui) {K.emit("daterange", ui);}

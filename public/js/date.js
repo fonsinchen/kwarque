@@ -51,7 +51,7 @@
                 }
             }
         }
-        if (startVal - endVal < 7 * 86400000) {
+        if (endVal - startVal < 7 * 86400000) {
             start += ' ' + K.date.time(startDate);
             end += ' ' + K.date.time(endDate);
         }
