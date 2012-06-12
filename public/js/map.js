@@ -105,6 +105,7 @@
                 var el = $(this);
                 var content = {
                     type : "fragment",
+                    time : el.find('.kwarque-map-input-time').val(),
                     x : el.find('.kwarque-map-input-lon').val(),
                     y : el.find('.kwarque-map-input-lat').val(),
                     title : el.find('.kwarque-map-input-title').val(),
@@ -139,6 +140,7 @@
             var markerClick = function(evt) {
                 data.dialog.dialog('option', 'title', this.data.title);
                 data.dialog.find('.kwarque-map-popup-text').text(this.data.text);
+                data.dialog.find('.kwarque-map-popup-time').text(K.date.format(new Date(this.data.time * 1000)));
                 data.dialog.find('.kwarque-map-popup-owner').text(this.data.owner);
                 openDialog(data.dialog, element.width(), element.height());
                 K.emit('fragmentOpened', this.data);

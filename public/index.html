@@ -22,7 +22,7 @@
         <script src="js/chatUi.js" type="text/javascript"></script>
         <script src="js/map.js" type="text/javascript"></script>
         <script src="js/bouncyslider.js" type="text/javascript"></script>
-        <script src="js/datelabels.js" type="text/javascript"></script>
+        <script src="js/date.js" type="text/javascript"></script>
 
         <script type="text/javascript">
             (function (K, $) {
@@ -33,7 +33,7 @@
                     $('.imprint-mail').text('kwarque' + '@' + 'kwarque' + '.' + 'net');
                     var now = (new Date()).getTime();
                     $('.kwarque-map-timeslider').bouncyslider({
-                        createLabels : K.datelabels,
+                        createLabels : K.date.labels,
                         min : -400000000000000,
                         max : 400000000000000,
                         lower : now - 86399000,
@@ -62,6 +62,9 @@
             <div class="kwarque-map-popup">
                 <p>
                     <span class="kwarque-map-popup-owner"></span>
+                    <span class="kwarque-map-popup-time"></span>
+                </p>
+                <p>
                     <span class="kwarque-map-popup-text"></span>
                 </p>
             </div>
@@ -71,6 +74,7 @@
                     <input type="hidden" class="kwarque-map-input-lat"/>
                     <input type="text" class="kwarque-map-input-title"/>
                     <textarea class="kwarque-map-input-text"></textarea>
+                    <input type="text" class="kwarque-map-input-time"/>
                     <input type="submit" value="kwrq" class="kwarque-map-input-submit">
                 </form>
             </div>

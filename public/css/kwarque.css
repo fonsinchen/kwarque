@@ -41,6 +41,9 @@ body, input, textarea {
 
 .kwarque-map-popup-owner {
     float: right;
+}
+
+.kwarque-map-popup-owner, .kwarque-map-popup-time {
     border: 1px solid white;
     padding-left: 3px;
     padding-right: 3px;
