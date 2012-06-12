@@ -61,6 +61,9 @@
                 title : "write new fragment",
                 autoOpen : false
             });
+            input.find('.kwarque-map-input-date').datepicker({
+                dateFormat: "yy/mm/dd"
+            });
             map.addLayer(markers);
             map.setCenter (lonLat, 16);
             var clickHandler = new OpenLayers.Handler.Click({'map': map}, {
@@ -103,9 +106,13 @@
             data.input.find('form').submit(function(e) {
                 e.preventDefault();
                 var el = $(this);
+                var time = el.find('.kwarque-map-input-date').datepicker('getDate').getTime() / 1000 + 
+                        el.find('.kwarque-map-input-hours').val() * 3600 +
+                        el.find('.kwarque-map-input-minutes').val() * 60;
+               
                 var content = {
                     type : "fragment",
-                    time : el.find('.kwarque-map-input-time').val(),
+                    time : time,
                     x : el.find('.kwarque-map-input-lon').val(),
                     y : el.find('.kwarque-map-input-lat').val(),
                     title : el.find('.kwarque-map-input-title').val(),
