@@ -7,6 +7,9 @@
  */
 
 (function (K, $) {
+    var currentBegin = 0;
+    var currentEnd = 0;
+    
     var tree = K.quadtree.init({
         x : -20037508.34,
         y : -20037508.34,
@@ -21,6 +24,22 @@
         dialog.dialog('option', 'height', h * 0.8);
         dialog.dialog('option', 'position', [w * 0.1, h * 0.1]);    
     };
+    
+    var isVisible = function(content, area, start, end) {
+        return !(content.x < area.x || content.x > area.x + area.w ||
+                content.y < area.y || content.y > area.y + area.h ||
+                content.time * 1000 < start || content.time * 1000 > end);
+    };
+    
+    var getArea = function(map) {
+        var extent = map.getExtent();
+        return {
+            x : extent.left,
+            y : extent.bottom,
+            w : extent.right - extent.left,
+            h : extent.top - extent.bottom
+        };
+    };
 
     var methods = {
         init : function() {
@@ -28,14 +47,8 @@
                 div : this[0],
                 eventListeners : {
                     moveend : function() {
-                        var extent = map.getExtent();
                         K.chat.emit("ignore", null, function() {
-                            tree.prepare({
-                                x : extent.left,
-                                y : extent.bottom,
-                                w : extent.right - extent.left,
-                                h : extent.top - extent.bottom
-                            }, function(depth, position, timestamp) {
+                            tree.prepare(getArea(map), function(depth, position, timestamp) {
                                 K.chat.emit("watch", {
                                     depth : depth,
                                     position : position,
@@ -45,6 +58,7 @@
                                 }); 
                             });
                         });
+                        
                     }
                 }
             });
@@ -84,6 +98,13 @@
             K.on('login', function() {
                 button.show();
             });
+            var self = this;
+            K.on('daterange', function(range) {
+                currentBegin = range.lower;
+                currentEnd = range.upper;
+                self.kwarqueMap('filterMarkers');
+            });
+            
             this.data('kwarqueMap', {
                 map : map,
                 markers : markers,
@@ -93,15 +114,48 @@
             return this;
         },
         
+        filterMarkers : function() {
+            var self = this;
+            var data = this.data("kwarqueMap");
+            var markers = data.markers.markers;
+            var invisible = {};
+            var visible = {};
+            var area = getArea(data.map);
+            for (var i = 0; i < markers.length; ++i) {
+                var content = markers[i].feature.data;
+                if (isVisible(content, area, currentBegin, currentEnd)) {
+                    visible[content.id] = content;
+                } else {
+                    invisible[content.id] = markers[i];
+                }
+            }
+            for (var id in invisible) {
+                if (invisible.hasOwnProperty(id)) data.markers.removeMarker(invisible[id]);
+            }
+            tree.retrieve(area, function(depth, position, timestamp, items) {
+                if (items !== null) {
+                    for (i = 0; i < items.length; ++i) {
+                        if (visible[items[i].id] === undefined &&
+                                isVisible(items[i], area, currentBegin, currentEnd)) {
+                            self.kwarqueMap('addMarker', items[i]);
+                        }
+                    }
+                }
+            });
+        },
+        
         connect : function() {
             var self = this;
+            var data = this.data("kwarqueMap");
             K.chat.on("fragment", function(item) {
                 item.h = item.h || 0;
                 item.w = item.w || 0;
                 tree.update(item);
-                self.kwarqueMap('addMarker', item);
+                if (isVisible(item, data.map, currentBegin, currentEnd)) {
+                    self.kwarqueMap('addMarker', item);
+                }
             });
-            var data = this.data("kwarqueMap");
+            
             
             data.input.find('form').submit(function(e) {
                 e.preventDefault();
@@ -120,9 +174,6 @@
                 };
                 K.chat.emit("insert", content, function(result, id) {
                     if (result === 'end') {
-                        content.id = id;
-                        content.owner = K.chat.getNick();
-                        self.kwarqueMap('addMarker', content);
                         el.find('.kwarque-map-input-title, .kwarque-map-input-text').val('');
                         data.input.dialog('close');
                     } else {
