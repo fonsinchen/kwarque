@@ -103,13 +103,15 @@
                 start : function(event) {
                     self._trigger('start', event, self._values);
                 },
+                create : function(event, ui) {
+                    adjustLabels(null, {values : [
+                        slider.slider('values', 0),
+                        slider.slider('values', 1)]
+                    });
+                    self._trigger('stop', event, self._values);
+                },
                 change : adjustLabels,
                 slide: adjustLabels
-            });
-
-            adjustLabels(null, {values : [
-                slider.slider('values', 0),
-                slider.slider('values', 1)]
             });
             return this;
         },
