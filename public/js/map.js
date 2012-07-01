@@ -10,6 +10,8 @@
     var currentBegin = 0;
     var currentEnd = 0;
     
+    var converter = Markdown.getSanitizingConverter();
+    
     var tree = K.quadtree.init({
         x : -20037508.34,
         y : -20037508.34,
@@ -76,7 +78,7 @@
                 autoOpen : false
             });
             input.find('.kwarque-map-input-date').datepicker({
-                dateFormat: "yy/mm/dd"
+                dateFormat: "yy-mm-dd"
             });
             map.addLayer(markers);
             map.setCenter (lonLat, 16);
@@ -86,6 +88,7 @@
                     input.find('.kwarque-map-input-lon').val(lonlat.lon);
                     input.find('.kwarque-map-input-lat').val(lonlat.lat);
                     openDialog(input, element.width(), element.height());
+                    new Markdown.Editor(converter).run();
                     clickHandler.deactivate();
                     element.css('cursor', 'default');
                 }
@@ -175,6 +178,7 @@
                 K.chat.emit("insert", content, function(result, id) {
                     if (result === 'end') {
                         el.find('.kwarque-map-input-title, .kwarque-map-input-text').val('');
+                        el.find('#wmd-button-bar').empty();
                         data.input.dialog('close');
                     } else {
                         // TODO: handle error
@@ -197,7 +201,7 @@
             var element = $(this);
             var markerClick = function(evt) {
                 data.dialog.dialog('option', 'title', this.data.title);
-                data.dialog.find('.kwarque-map-popup-text').text(this.data.text);
+                data.dialog.find('.kwarque-map-popup-text').html(converter.makeHtml(this.data.text));
                 data.dialog.find('.kwarque-map-popup-time').text(K.date.format(new Date(this.data.time * 1000)));
                 data.dialog.find('.kwarque-map-popup-owner').text(this.data.owner);
                 openDialog(data.dialog, element.width(), element.height());
